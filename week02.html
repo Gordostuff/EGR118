@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python for Engineers Week 2 Data Types, Strings, Input, and Unit Conversion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f0; --card:#ffffff; --ink:#1a1f24; --mute:#59636e; --line:#d9d6cb;
+  --accent:#0a5aa0; --accent-ink:#ffffff; --accent-soft:#e4eef8;
+  --ok:#17692f; --ok-bg:#e5f3e9; --bad:#a82217; --bad-bg:#fcebe8; --warn:#8a5a00; --warn-bg:#fdf3dc;
+  --code-bg:#f0eee6; --out-bg:#e6edf6; --out-ink:#0a2a66;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#11151a; --card:#192028; --ink:#e7ebef; --mute:#9aa6b2; --line:#2c3641;
+    --accent:#5eaeea; --accent-ink:#0b1219; --accent-soft:#17283a;
+    --ok:#6fd08c; --ok-bg:#15301f; --bad:#ff8a7d; --bad-bg:#3a1b18; --warn:#f0c060; --warn-bg:#33290f;
+    --code-bg:#10161c; --out-bg:#e6edf6; --out-ink:#0a2a66;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px}
+.skip{position:absolute;left:-999px}
+.skip:focus{left:8px;top:8px;background:var(--card);padding:8px;z-index:50}
+header.top{padding:28px 0 12px}
+.kicker{font-size:13px;color:var(--mute);letter-spacing:.02em;margin:0 0 4px}
+h1{font-size:clamp(24px,5vw,34px);line-height:1.2;margin:0 0 10px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.chips li{font-size:13px;border:1px solid var(--line);background:var(--card);padding:2px 10px;border-radius:999px;color:var(--mute)}
+nav.tabs{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px;color:var(--mute);cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible,button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.statusbar{position:sticky;top:46px;z-index:15;background:var(--card);border:1px solid var(--line);border-radius:8px;margin:10px 0;padding:6px 12px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--mute)}
+.statusbar .grow{flex:1}
+main{padding:16px 0 80px}
+.panel[hidden]{display:none}
+h2{font-size:22px;margin:24px 0 8px;font-weight:600}
+h3{font-size:18px;margin:0 0 6px;font-weight:600}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 12px;padding-left:22px}
+li{margin:2px 0}
+code{font-family:var(--mono);font-size:.92em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:0 0 16px}
+.card .meta{font-size:13px;color:var(--mute);margin:0 0 8px}
+.hook{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 0 16px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.tile .big{font-size:24px;font-weight:600;font-family:var(--mono)}
+.tile .lbl{font-size:13px;color:var(--mute)}
+.bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden;margin:6px 0 14px}
+.bar>span{display:block;height:100%;background:var(--accent);width:0}
+button.btn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;border-radius:6px;cursor:pointer}
+button.btn:hover{border-color:var(--accent)}
+button.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.cell{margin:12px 0}
+textarea.code{display:block;width:100%;font-family:var(--mono);font-size:14px;line-height:1.5;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px 12px;resize:vertical;tab-size:4;white-space:pre;overflow:auto;min-height:60px}
+.stdin{margin-top:6px}
+.stdin label{font-size:13px;color:var(--mute);display:block}
+textarea.stdin-box{width:100%;font-family:var(--mono);font-size:13px;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-height:48px}
+.out{margin-top:8px}
+pre.stdout{margin:0;background:var(--out-bg);color:var(--out-ink);font-family:var(--mono);font-size:13.5px;padding:10px 12px;border-radius:6px;border:1px solid #b9c8dc;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.err{margin-top:8px;border:1px solid var(--bad);background:var(--bad-bg);color:var(--bad);border-radius:6px;padding:8px 12px;font-size:14px}
+.err pre{margin:4px 0 0;font-family:var(--mono);font-size:13px;white-space:pre-wrap;color:inherit}
+.out img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin-top:8px;border:1px solid var(--line)}
+.tests{list-style:none;margin:8px 0 0;padding:0}
+.tests li{display:flex;gap:10px;align-items:flex-start;padding:4px 0;font-size:14px;border-bottom:1px dashed var(--line)}
+.badge{font-family:var(--mono);font-size:12px;font-weight:500;padding:1px 8px;border-radius:4px;flex:none}
+.badge.pass{background:var(--ok-bg);color:var(--ok)}
+.badge.fail{background:var(--bad-bg);color:var(--bad)}
+.badge.info{background:var(--accent-soft);color:var(--accent)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.hint{margin:8px 0;padding:8px 12px;background:var(--warn-bg);color:var(--ink);border-radius:6px;font-size:14px;border:1px solid var(--line)}
+.q{margin:0 0 6px;font-weight:500}
+.q p{margin:0 0 8px}
+.q pre,.card pre{background:var(--code-bg);padding:8px 12px;border-radius:6px;overflow:auto;font-family:var(--mono);font-size:13.5px;font-weight:400;margin:0 0 10px}
+.q pre code,.card pre code{background:none;padding:0}
+.opts{list-style:none;padding:0;margin:0}
+.opts button{display:block;width:100%;text-align:left;font:inherit;font-size:15px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:6px 0;cursor:pointer}
+.opts button:hover:not(:disabled){border-color:var(--accent)}
+.opts button.right{border-color:var(--ok);background:var(--ok-bg)}
+.opts button.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opts button:disabled{cursor:default}
+.why{margin-top:8px;font-size:14px;padding:8px 12px;border-radius:6px;background:var(--accent-soft)}
+.checkq{margin:14px 0 4px;padding:12px;border:1px dashed var(--line);border-radius:8px}
+.done-row{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px}
+.field{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.field input{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);min-width:240px}
+textarea.report{width:100%;min-height:200px;font-family:var(--mono);font-size:12.5px;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px}
+table{border-collapse:collapse;width:100%;margin:0 0 12px;font-size:14px}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--code-bg)}
+.small{font-size:13px;color:var(--mute)}
+@media (max-width:600px){ .field input{min-width:0;width:100%} .statusbar{top:44px} }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+  <p class="kicker" id="kicker"></p>
+  <h1 id="title"></h1>
+  <ul class="chips" id="chips"></ul>
+</div></header>
+<nav class="tabs" aria-label="Sections"><div class="wrap" role="tablist" id="tablist"></div></nav>
+<main id="main"><div class="wrap">
+  <div class="statusbar" id="statusbar" role="status" aria-live="polite">
+    <span id="pystatus">Python starts when you run your first cell.</span>
+    <span class="grow"></span>
+    <button class="btn" id="stopbtn" hidden>Stop</button>
+  </div>
+  <section class="panel" id="panel-overview"></section>
+  <section class="panel" id="panel-lecture" hidden></section>
+  <section class="panel" id="panel-lab" hidden></section>
+  <section class="panel" id="panel-quiz" hidden></section>
+</div></main>
+
+<script id="data" type="application/json">{"course_id": "pyeng", "course_title": "Python for Engineers", "pyodide_base": "https://cdn.jsdelivr.net/pyodide/v0.27.8/full/", "num": 2, "title": "Data Types, Strings, Input, and Unit Conversion", "hook": "In 1999 NASA lost the Mars Climate Orbiter. One team's software produced thruster data in pound-force seconds, and the navigation software expected newton-seconds. The spacecraft flew a lower path than planned and was lost. The arithmetic was correct on both sides; the units did not match. This week you learn to handle text, formatting, and unit conversion so your programs say what they mean.", "objectives": ["create, slice, and clean strings with common string methods", "format numbers with f-strings to control decimals, width, and alignment", "convert between <code>str<\/code>, <code>int<\/code>, and <code>float<\/code>, and explain the errors that bad conversions cause", "read user input with <code>input()<\/code> and turn it into numbers", "write unit conversions with named constants and clear labels"], "summary": "<ul><li>Put units in names. Store conversion factors in capitalized constants. Convert where data enters and leaves your program.<\/li><li>Strings: <code>len<\/code>, indexing from 0, slices <code>s[a:b]<\/code>, <code>+<\/code> joins, <code>*<\/code> repeats.<\/li><li>String methods return new strings: <code>strip<\/code>, <code>upper<\/code>, <code>lower<\/code>, <code>replace<\/code>, <code>split<\/code>, <code>startswith<\/code>.<\/li><li>f-string codes: <code>.2f<\/code>, <code>.3e<\/code>, <code>,<\/code>, <code>.1%<\/code>, <code>&gt;10<\/code>, <code>&lt;10<\/code>.<\/li><li>Convert on purpose with <code>int()<\/code>, <code>float()<\/code>, <code>str()<\/code>. <code>int(3.9)<\/code> truncates to 3.<\/li><li><code>input()<\/code> always returns a string. Convert it before math.<\/li><li>Test every conversion with a value you already know.<\/li><\/ul>", "lecture": [{"title": "Why units belong in your code", "minutes": 10, "html": "<p>The Mars Climate Orbiter loss is a standard case study because the cause was a data mismatch and not a calculation error. A conversion factor of about 4.45 sat between two teams' numbers, and no one applied it.<\/p>\n<p>Your defense is a short list of habits: put units in variable names, store conversion factors in named constants, and convert at the edges of your program (when data comes in and when results go out). The cell below shows the factor between pound-force seconds and newton-seconds.<\/p>", "cells": [{"code": "impulse_lbf_s = 100.0\nLBF_TO_N = 4.448222\nimpulse_n_s = impulse_lbf_s * LBF_TO_N\nprint(impulse_n_s)\n", "stdin": null, "note": "Naming a constant in capital letters is a convention that tells readers the value will not change."}]}, {"title": "Strings: text as data", "minutes": 20, "html": "<p>A <strong>string<\/strong> (<code>str<\/code>) is a sequence of characters inside single or double quotes. Engineers handle strings constantly: sensor labels, file names, log lines, and part numbers.<\/p>\n<p>Useful operations:<\/p>\n<ul><li><code>len(s)<\/code> counts characters<\/li><li><code>s[0]<\/code> is the first character; <code>s[-1]<\/code> is the last (counting starts at 0)<\/li><li><code>s[a:b]<\/code> is a <strong>slice<\/strong> from index a up to but not including b<\/li><li><code>+<\/code> joins strings; <code>*<\/code> repeats them<\/li><\/ul>", "cells": [{"code": "part = \"Motor-7\"\nprint(len(part))\nprint(part[0])\nprint(part[-1])\nprint(part[0:5])\n", "stdin": null, "note": null}, {"code": "print(\"Motor\" + \"-\" + \"7\")\nprint(\"=\" * 20)\n", "stdin": null, "note": null}], "check": {"q": "What does <code>\"voltage\"[0:3]<\/code> give?", "options": ["<code>ltage<\/code>", "<code>vol<\/code>", "<code>volt<\/code>", "<code>v<\/code>"], "answer": 1, "why": "A slice includes the start index and excludes the end index: characters 0, 1, and 2 are v, o, l."}}, {"title": "String methods for cleaning data", "minutes": 15, "html": "<p>A <strong>method<\/strong> is a function that belongs to a value, written with a dot. Strings have dozens. The ones you will use most:<\/p>\n<ul><li><code>s.strip()<\/code> removes spaces and line breaks from both ends<\/li><li><code>s.upper()<\/code> and <code>s.lower()<\/code> change case<\/li><li><code>s.replace(old, new)<\/code> swaps text<\/li><li><code>s.split(sep)<\/code> cuts a string into pieces at each separator and returns a list<\/li><li><code>s.startswith(text)<\/code> and <code>text in s<\/code> test content<\/li><\/ul>\n<p>Strings are <strong>immutable<\/strong>: a method returns a new string and leaves the original unchanged. Store the result if you want to keep it.<\/p>", "cells": [{"code": "raw = \"  TEMP:21.5C  \"\nclean = raw.strip()\nparts = clean.split(\":\")\nprint(parts)\nvalue_text = parts[1].replace(\"C\", \"\")\nvalue = float(value_text)\nprint(value + 1)\n", "stdin": null, "note": null}, {"code": "name = \"sensor\"\nname.upper()\nprint(name)\nname = name.upper()\nprint(name)\n", "stdin": null, "note": "The first <code>upper()<\/code> call does nothing useful because the result is thrown away."}, {"code": "log = \"ERROR: pump 3 offline\"\nprint(log.startswith(\"ERROR\"))\nprint(\"pump\" in log)\n", "stdin": null, "note": null}], "check": {"q": "What does <code>\"12.5V\".replace(\"V\", \"\")<\/code> return?", "options": ["<code>12.5<\/code> as a float", "<code>\"V\"<\/code>", "<code>\"12.5V\"<\/code>", "<code>\"12.5\"<\/code>"], "answer": 3, "why": "<code>replace<\/code> swaps each <code>V<\/code> for the empty string and returns the string <code>\"12.5\"<\/code>. It is still text until you call <code>float()<\/code>."}}, {"title": "f-strings and number formatting", "minutes": 20, "html": "<p>An <strong>f-string<\/strong> starts with <code>f<\/code> before the opening quote and holds expressions inside braces. After a colon inside the braces, a format code controls how the value appears.<\/p>\n<table><thead><tr><th>Code<\/th><th>Meaning<\/th><th>Example<\/th><th>Result<\/th><\/tr><\/thead><tbody><tr><td><code>.2f<\/code><\/td><td>2 decimals<\/td><td><code>f\"{3.14159:.2f}\"<\/code><\/td><td>3.14<\/td><\/tr><tr><td><code>.3e<\/code><\/td><td>scientific, 3 decimals<\/td><td><code>f\"{4700:.3e}\"<\/code><\/td><td>4.700e+03<\/td><\/tr><tr><td><code>,<\/code><\/td><td>thousands separator<\/td><td><code>f\"{1234567:,}\"<\/code><\/td><td>1,234,567<\/td><\/tr><tr><td><code>.1%<\/code><\/td><td>percent<\/td><td><code>f\"{0.256:.1%}\"<\/code><\/td><td>25.6%<\/td><\/tr><tr><td><code>&gt;10<\/code><\/td><td>right-align in 10 spaces<\/td><td><code>f\"{'psi':&gt;10}\"<\/code><\/td><td><code>       psi<\/code><\/td><\/tr><tr><td><code>&lt;10<\/code><\/td><td>left-align in 10 spaces<\/td><td><code>f\"{'psi':&lt;10}\"<\/code><\/td><td><code>psi       <\/code><\/td><\/tr><\/tbody><\/table>\n<p>Format only when you display a number. Keep full precision in your variables.<\/p>", "cells": [{"code": "voltage = 12\ncurrent = 0.83333\nprint(f\"V = {voltage} V, I = {current:.3f} A\")\n", "stdin": null, "note": null}, {"code": "print(f\"{4700:.3e}\")\nprint(f\"{1234567:,}\")\nprint(f\"{0.256:.1%}\")\n", "stdin": null, "note": null}, {"code": "print(f\"{'Unit':<8}{'Value':>10}\")\nprint(\"-\" * 18)\nprint(f\"{'psi':<8}{30:>10.2f}\")\nprint(f\"{'kPa':<8}{30 * 6.894757:>10.2f}\")\n", "stdin": null, "note": "Width and alignment line up columns in a report."}], "check": {"q": "What does <code>f\"{2/3:.2f}\"<\/code> produce?", "options": ["<code>\"0.6667\"<\/code>", "<code>\"0.67\"<\/code>", "<code>\"2/3\"<\/code>", "<code>\"0.66\"<\/code>"], "answer": 1, "why": "<code>.2f<\/code> rounds to two decimals: 0.666... rounds to 0.67."}}, {"title": "Converting between types", "minutes": 15, "html": "<p>Python never guesses a conversion. <code>\"5\" + 3<\/code> is an error because one value is text and the other is a number. Convert on purpose:<\/p>\n<ul><li><code>int(\"42\")<\/code> turns text into a whole number<\/li><li><code>float(\"3.5\")<\/code> turns text into a decimal<\/li><li><code>str(12)<\/code> turns a number into text<\/li><li><code>int(3.9)<\/code> gives 3: it <strong>truncates<\/strong> toward zero. Use <code>round(3.9)<\/code> when you want rounding.<\/li><\/ul>\n<p>If the text does not look like a number, Python raises a <code>ValueError<\/code>.<\/p>", "cells": [{"code": "print(int(\"42\") + 8)\nprint(float(\"3.5\") * 2)\nprint(\"Ch\" + str(4))\nprint(int(3.9), round(3.9))\n", "stdin": null, "note": null}, {"code": "print(\"5\" + 3)\n", "stdin": null, "note": "A TypeError on purpose. Fix it by converting one side."}, {"code": "print(int(\"abc\"))\n", "stdin": null, "note": "A ValueError on purpose. Week 7 shows how to handle bad input without stopping the program."}], "check": {"q": "What is <code>int(3.9)<\/code>?", "options": ["3.9", "4", "An error", "3"], "answer": 3, "why": "<code>int<\/code> removes the decimal part without rounding. Use <code>round(3.9)<\/code> to get 4."}}, {"title": "Reading input with input()", "minutes": 15, "html": "<p><code>input(prompt)<\/code> pauses the program, shows the prompt, and returns what the user typed as a <strong>string<\/strong>. Convert it before you do math.<\/p>\n<p>In this course the page cannot pause for typing, so cells that call <code>input()<\/code> have an <strong>Input box<\/strong> below the code. Type one line per <code>input()<\/code> call, in order. Run the cell and the program reads those lines.<\/p>", "cells": [{"code": "name = input(\"Technician name: \")\nvolts = float(input(\"Voltage (V): \"))\nprint(f\"{name} measured {volts:.1f} V\")\n", "stdin": ["Ana", "12.6"], "note": "Change the lines in the Input box and run again."}, {"code": "a = input(\"First: \")\nb = input(\"Second: \")\nprint(a + b)\nprint(float(a) + float(b))\n", "stdin": ["3", "4"], "note": "Without conversion, <code>+<\/code> joins the two strings. With <code>float<\/code>, it adds the numbers."}], "check": {"q": "What type does <code>input()<\/code> return?", "options": ["Whatever type the prompt suggests", "<code>str<\/code>, always", "<code>int<\/code> when the user types digits", "<code>float<\/code> when the user types a decimal"], "answer": 1, "why": "<code>input()<\/code> returns text every time. You decide what to convert it into."}}, {"title": "Unit conversions in code", "minutes": 20, "html": "<p>A good conversion has three parts: a named factor, a calculation, and a labeled result. Factors you will use this course:<\/p>\n<table><thead><tr><th>Conversion<\/th><th>Factor<\/th><\/tr><\/thead><tbody><tr><td>inches to millimeters<\/td><td>multiply by <code>25.4<\/code><\/td><\/tr><tr><td>miles per hour to meters per second<\/td><td>multiply by <code>0.44704<\/code><\/td><\/tr><tr><td>psi to kilopascals<\/td><td>multiply by <code>6.894757<\/code><\/td><\/tr><tr><td>pound-force to newtons<\/td><td>multiply by <code>4.448222<\/code><\/td><\/tr><tr><td>Fahrenheit to Celsius<\/td><td><code>(f - 32) * 5 / 9<\/code><\/td><\/tr><tr><td>Celsius to Kelvin<\/td><td><code>c + 273.15<\/code><\/td><\/tr><\/tbody><\/table>\n<p>Check each conversion with a value you already know. One inch should give 25.4 mm. Water freezes at 32 F, which is 0 C.<\/p>", "cells": [{"code": "IN_TO_MM = 25.4\nPSI_TO_KPA = 6.894757\nprint(f\"4 in = {4 * IN_TO_MM:.1f} mm\")\nprint(f\"32 psi = {32 * PSI_TO_KPA:.2f} kPa\")\n", "stdin": null, "note": null}, {"code": "f_temp = 212\nc_temp = (f_temp - 32) * 5 / 9\nk_temp = c_temp + 273.15\nprint(f\"{f_temp} F = {c_temp:.1f} C = {k_temp:.2f} K\")\n", "stdin": null, "note": "Test known values: 212 F should give 100 C."}], "check": {"q": "How many millimeters are in 4 inches?", "options": ["6.3", "100.0", "25.4", "101.6"], "answer": 3, "why": "Multiply by 25.4: 4 * 25.4 = 101.6 mm."}}, {"title": "Putting it together: a speed report", "minutes": 15, "html": "<p>This program reads a speed in miles per hour and prints a formatted table in three units. Study the structure: constants at the top, input and conversion in the middle, labeled output at the end.<\/p>", "cells": [{"code": "MPH_TO_MS = 0.44704\nMPH_TO_KPH = 1.609344\n\nmph = float(input(\"Speed (mph): \"))\nms = mph * MPH_TO_MS\nkph = mph * MPH_TO_KPH\n\nprint(f\"{'Unit':<6}{'Value':>10}\")\nprint(\"-\" * 16)\nprint(f\"{'mph':<6}{mph:>10.2f}\")\nprint(f\"{'km/h':<6}{kph:>10.2f}\")\nprint(f\"{'m/s':<6}{ms:>10.2f}\")\n", "stdin": ["60"], "note": null}]}], "lecture_minutes": 130, "lab": {"summary": "A unit converter that cleans sensor labels, formats tables, reads input, and catches a Mars Climate Orbiter style mismatch.", "intro_html": "<p>You are building a unit converter that a test technician could use on the bench. Tasks that read input run your code with scripted values, so the checks work without typing. If your program uses <code>input()<\/code>, the Input box below the editor shows a sample value you can change for your own testing.<\/p>\n<p>Conversion factors you may need: <code>25.4<\/code> mm per inch, <code>6.894757<\/code> kPa per psi, <code>4.448222<\/code> N per lbf.<\/p>", "tasks": [{"id": "t1", "title": "Clean a sensor label", "points": 15, "minutes": 20, "bonus": false, "prompt_html": "<p>A log line arrives as <code>\"  Sensor-A7: 21.5 C  \"<\/code>. Fill in each variable:<\/p>\n<ul><li><code>cleaned<\/code>: the label without the spaces at the ends<\/li><li><code>name<\/code>: the text before the colon<\/li><li><code>reading_text<\/code>: the text after the colon, with ends stripped<\/li><li><code>value<\/code>: the temperature as a float (21.5)<\/li><\/ul>", "starter": "label = \"  Sensor-A7: 21.5 C  \"\n\ncleaned = ...\nname = ...\nreading_text = ...\nvalue = ...\n\nprint(name, value)\n", "hint_html": "<p>Chain methods: <code>label.strip()<\/code> first. <code>cleaned.split(\":\")<\/code> returns two pieces. For the number, split <code>reading_text<\/code> on spaces and convert the first piece with <code>float<\/code>.<\/p>", "stdin": null, "tests": {"setup": "", "items": [["cleaned has no outer spaces", "cleaned == 'Sensor-A7: 21.5 C'", "Use label.strip()."], ["name is Sensor-A7", "name == 'Sensor-A7'", "Split cleaned at the colon and take piece 0."], ["reading_text is '21.5 C'", "reading_text == '21.5 C'", "Take piece 1 and strip it."], ["value is the float 21.5", "isinstance(value, float) and value == 21.5", "Split reading_text on spaces, then convert the first piece with float()."]]}}, {"id": "t2", "title": "Pressure table with f-strings", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>Print three lines that convert 10, 20, and 30 psi to kilopascals with two decimals. Use f-strings. The first line is:<\/p>\n<pre><code>10 psi = 68.95 kPa<\/code><\/pre>\n<p>Use the constant <code>PSI_TO_KPA<\/code>. Loops come in week 4, so write three <code>print<\/code> calls.<\/p>", "starter": "PSI_TO_KPA = 6.894757\n\n# Write three print() calls with f-strings below\n", "hint_html": "<p><code>print(f\"10 psi = {10 * PSI_TO_KPA:.2f} kPa\")<\/code> is the first line. Repeat for 20 and 30.<\/p>", "stdin": null, "tests": {"setup": "", "items": [["output has the three exact lines", "out.strip().splitlines() == ['10 psi = 68.95 kPa', '20 psi = 137.90 kPa', '30 psi = 206.84 kPa']", "Check spacing and use :.2f so 137.9 prints as 137.90."], ["uses f-strings", "uses_node(src, 'JoinedStr')", "Write the print arguments as f-strings."], ["uses the constant", "src.count('PSI_TO_KPA') >= 4", "Use PSI_TO_KPA in each calculation instead of typing the number."]]}}, {"id": "t3", "title": "Temperature conversion", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>Convert <code>f_temp = 98.6<\/code> Fahrenheit to Celsius (<code>c_temp<\/code>) and Kelvin (<code>k_temp<\/code>). Print one line in exactly this form:<\/p>\n<pre><code>98.6 F = 37.0 C = 310.15 K<\/code><\/pre>\n<p>Celsius uses one decimal and Kelvin uses two.<\/p>", "starter": "f_temp = 98.6\n\nc_temp = ...\nk_temp = ...\n\n# Print the line here\n", "hint_html": "<p><code>c_temp = (f_temp - 32) * 5 / 9<\/code> and <code>k_temp = c_temp + 273.15<\/code>. Format with <code>{c_temp:.1f}<\/code> and <code>{k_temp:.2f}<\/code>.<\/p>", "stdin": null, "tests": {"setup": "", "items": [["c_temp is 37.0", "approx(c_temp, 37.0, rel=1e-9)", "Subtract 32 first, then multiply by 5 and divide by 9."], ["k_temp is 310.15", "approx(k_temp, 310.15, rel=1e-9)", "Add 273.15 to the Celsius value."], ["printed line is exact", "out.strip() == '98.6 F = 37.0 C = 310.15 K'", "Match the format: one decimal for C, two for K."]]}}, {"id": "t4", "title": "Inches to millimeters from input", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>Write a program that reads a length in inches with <code>input()<\/code>, converts it to millimeters, and prints:<\/p>\n<pre><code>10.00 in = 254.00 mm<\/code><\/pre>\n<p>Both numbers use two decimals. Test input is <code>10<\/code>. The checks also try <code>2.5<\/code>.<\/p>", "starter": "MM_PER_INCH = 25.4\n\ninches = ...   # read from the user and convert to a float\nmm = ...\n\n# Print the result here\n", "hint_html": "<p><code>inches = float(input(\"Inches: \"))<\/code>. Then <code>mm = inches * MM_PER_INCH<\/code>. Print with <code>:.2f<\/code> on both numbers.<\/p>", "stdin": ["10"], "tests": {"setup": "", "items": [["input 10 gives 254.00 mm", "'10.00 in = 254.00 mm' in run_with(src, ['10']).splitlines()[-1]", "Print exactly: 10.00 in = 254.00 mm"], ["input 2.5 gives 63.50 mm", "'2.50 in = 63.50 mm' in run_with(src, ['2.5']).splitlines()[-1]", "Convert the input with float() so decimals work."], ["program calls input()", "calls_name(src, 'input') and calls_name(src, 'float')", "Use input() and float()."]]}}, {"id": "t5", "title": "Pressure report", "points": 25, "minutes": 35, "bonus": false, "prompt_html": "<p>Write a program that reads a pressure in psi and prints a report in three units. Use these factors: 1 psi = 6.894757 kPa, 1 bar = 100 kPa, 1 atm = 101.325 kPa. For <code>30<\/code> the program prints these lines (a prompt may appear on the line with your input):<\/p>\n<pre><code>Pressure report\npsi: 30.00\nkPa: 206.84\nbar: 2.07\natm: 2.04<\/code><\/pre>", "starter": "PSI_TO_KPA = 6.894757\nKPA_PER_BAR = 100\nKPA_PER_ATM = 101.325\n\n# Read psi, compute kpa, bar, and atm, then print the report\n", "hint_html": "<p>Convert once to kPa. Then <code>bar = kpa / KPA_PER_BAR<\/code> and <code>atm = kpa / KPA_PER_ATM<\/code>. Print a title line first, then each unit with <code>:.2f<\/code>.<\/p>", "stdin": ["30"], "tests": {"setup": "\nlines30 = run_with(src, ['30']).splitlines()\nlines1 = run_with(src, ['14.696']).splitlines()\n", "items": [["title line is present", "'Pressure report' in lines30", "Print the title line exactly: Pressure report"], ["psi line for 30", "'psi: 30.00' in lines30", "Print psi with two decimals."], ["kPa line for 30", "'kPa: 206.84' in lines30", "kpa = psi * PSI_TO_KPA"], ["bar line for 30", "'bar: 2.07' in lines30", "bar = kpa / KPA_PER_BAR"], ["atm line for 30", "'atm: 2.04' in lines30", "atm = kpa / KPA_PER_ATM"], ["works for 14.696 psi", "'atm: 1.00' in lines1 and 'kPa: 101.33' in lines1", "Test your program with a different input; do not hard-code 30."]]}}, {"id": "t6", "title": "Catch the unit mismatch", "points": 15, "minutes": 20, "bonus": false, "prompt_html": "<p>Team A reports a thruster impulse of <code>impulse_lbf_s = 125.0<\/code> pound-force seconds. Team B reads the same number as newton-seconds. Compute:<\/p>\n<ul><li><code>actual_n_s<\/code>: the real impulse in newton-seconds (1 lbf = 4.448222 N)<\/li><li><code>shortfall_percent<\/code>: how far Team B's value (<code>125.0<\/code>) falls below the actual value, as a percent of the actual value<\/li><\/ul>\n<p>Print one line: <code>125.0 lbf-s = 556.0 N-s<\/code>.<\/p>", "starter": "LBF_TO_N = 4.448222\nimpulse_lbf_s = 125.0\n\nactual_n_s = ...\nshortfall_percent = ...\n\n# Print the line here\n", "hint_html": "<p><code>actual_n_s = impulse_lbf_s * LBF_TO_N<\/code>. Team B used <code>impulse_lbf_s<\/code> as if it were newtons. The shortfall is <code>(actual_n_s - impulse_lbf_s) / actual_n_s * 100<\/code>.<\/p>", "stdin": null, "tests": {"setup": "", "items": [["actual impulse is 556.03 N-s", "approx(actual_n_s, 556.02775, rel=1e-6)", "Multiply by LBF_TO_N."], ["shortfall is about 77.5 percent", "approx(shortfall_percent, 77.519, rel=1e-4)", "Compare Team B's 125.0 with the actual value."], ["printed line is exact", "out.strip() == '125.0 lbf-s = 556.0 N-s'", "Use one decimal on both numbers."]]}}, {"id": "b1", "title": "Tire pressure parser", "points": 10, "minutes": 20, "bonus": true, "prompt_html": "<p>A log line says <code>text = \"Tire: 32 psi\"<\/code>. Pull out the number, convert it to kilopascals, and print <code>Tire: 220.63 kPa<\/code>. Store the number in <code>psi_value<\/code> and the result in <code>kpa_value<\/code>.<\/p>", "starter": "PSI_TO_KPA = 6.894757\ntext = \"Tire: 32 psi\"\n\npsi_value = ...\nkpa_value = ...\n", "hint_html": "<p>Split on the colon, strip, split on the space, and convert the first piece with <code>float<\/code>.<\/p>", "stdin": null, "tests": {"setup": "", "items": [["psi_value is 32.0", "psi_value == 32.0", "Use float on the numeric text."], ["output is Tire: 220.63 kPa", "out.strip() == 'Tire: 220.63 kPa'", "Print with two decimals."]]}}]}, "lab_minutes": 150, "quiz": [{"q": "What does <code>len(\"Motor-7\")<\/code> return?", "options": ["8", "Motor", "7", "6"], "answer": 2, "why": "The string has 7 characters: M, o, t, o, r, hyphen, 7."}, {"q": "What does <code>\"voltage\"[0:3]<\/code> return?", "options": ["<code>v<\/code>", "<code>ltage<\/code>", "<code>volt<\/code>", "<code>vol<\/code>"], "answer": 3, "why": "The slice includes index 0 through 2 and excludes index 3."}, {"q": "What does <code>\"data.csv\".upper()<\/code> return?", "options": ["<code>DATA.CSV<\/code>", "<code>Data.csv<\/code>", "<code>data.CSV<\/code>", "<code>data.csv<\/code>"], "answer": 0, "why": "<code>upper()<\/code> returns a copy with every letter in capitals."}, {"q": "What does <code>f\"{3.14159:.2f}\"<\/code> produce?", "options": ["3.1", "3.14", "3.14159", "3.142"], "answer": 1, "why": "<code>.2f<\/code> keeps two digits after the decimal point and rounds."}, {"q": "What type does <code>input()<\/code> return?", "options": ["<code>float<\/code>", "It depends on what the user types", "<code>str<\/code>", "<code>int<\/code>"], "answer": 2, "why": "<code>input()<\/code> always returns text. Convert it with <code>int()<\/code> or <code>float()<\/code> before math."}, {"q": "What is <code>int(\"42\") + 8<\/code>?", "options": ["428", "42 + 8", "An error", "50"], "answer": 3, "why": "<code>int(\"42\")<\/code> is the number 42, and 42 + 8 is 50."}, {"q": "What happens when Python runs <code>\"5\" + 3<\/code>?", "options": ["A <code>TypeError<\/code>", "It prints 8", "It prints 5 + 3", "It prints 53"], "answer": 0, "why": "Python does not mix text and numbers with <code>+<\/code>. Convert one side first."}, {"q": "What is <code>int(3.9)<\/code>?", "options": ["3.9", "3", "4", "3.0"], "answer": 1, "why": "<code>int<\/code> truncates the decimal part. It does not round."}, {"q": "What does <code>\"a,b,c\".split(\",\")<\/code> return?", "options": ["<code>('a', 'b', 'c')<\/code>", "<code>3<\/code>", "<code>['a', 'b', 'c']<\/code>", "<code>'abc'<\/code>"], "answer": 2, "why": "<code>split<\/code> cuts the string at each comma and returns a list of the pieces."}, {"q": "How many millimeters are in 4 inches?", "options": ["25.4 mm", "6.3 mm", "100.0 mm", "101.6 mm"], "answer": 3, "why": "One inch is 25.4 mm, so 4 inches is 101.6 mm."}, {"q": "What habit best prevents a unit mix-up like the Mars Climate Orbiter loss?", "options": ["Name units in variables and convert where data enters and leaves", "Use floats for every value", "Avoid conversions in code", "Round every result to two decimals"], "answer": 0, "why": "Visible units and one conversion point make a mismatch easy to spot during review."}, {"q": "What does <code>f\"{0.256:.1%}\"<\/code> produce?", "options": ["0.3%", "25.6%", "0.256%", "2.6%"], "answer": 1, "why": "The <code>%<\/code> code multiplies by 100 and adds a percent sign. <code>.1<\/code> keeps one decimal."}], "quiz_minutes": 18, "quiz_intro_html": "<p>Answer each question. You see the explanation right after you choose. You can reset the quiz and try again.<\/p>"}</script>
+<script id="harness" type="text/x-python">import sys, io, os, json, ast, base64, builtins, traceback, contextlib, math, random
+
+os.environ.setdefault("MPLBACKEND", "Agg")
+import importlib
+if "" not in sys.path:
+    sys.path.insert(0, "")
+
+_OUT_CAP = 20000
+_LECTURE_NS = {"__name__": "__main__"}
+
+
+class _Capped(io.StringIO):
+    def write(self, s):
+        if self.tell() > _OUT_CAP:
+            raise RuntimeError("Output limit reached. Your code printed too much text.")
+        return super().write(s)
+
+
+def approx(a, b, rel=1e-6, abs_=1e-9):
+    try:
+        if "numpy" in sys.modules:
+            import numpy as _np
+            if isinstance(a, _np.ndarray) or isinstance(b, _np.ndarray):
+                return bool(_np.allclose(a, b, rtol=rel, atol=abs_))
+        if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+            return len(a) == len(b) and all(approx(x, y, rel, abs_) for x, y in zip(a, b))
+        return abs(float(a) - float(b)) <= max(abs_, rel * abs(float(b)))
+    except Exception:
+        return False
+
+
+def uses_node(src, *names):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return False
+    wanted = tuple(getattr(ast, n) for n in names)
+    return any(isinstance(n, wanted) for n in ast.walk(tree))
+
+
+def calls_name(src, name):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return False
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Call):
+            f = n.func
+            if isinstance(f, ast.Name) and f.id == name:
+                return True
+            if isinstance(f, ast.Attribute) and f.attr == name:
+                return True
+    return False
+
+
+def line_has(src, target, *words):
+    """True when an assignment to `target` has every word on its right side."""
+    for line in src.splitlines():
+        s = line.strip()
+        if s.startswith("#") or "=" not in s:
+            continue
+        left, _, right = s.partition("=")
+        if left.strip() == target and all(w in right for w in words):
+            return True
+    return False
+
+
+def run_with(src, inputs=(), ns=None):
+    """Run student source with scripted input() values; return what it printed."""
+    queue = list(inputs)
+    old = builtins.input
+
+    def _fake(prompt=""):
+        print(prompt, end="")
+        if not queue:
+            raise EOFError("input() called more times than expected")
+        v = queue.pop(0)
+        print(v)
+        return v
+
+    buf = io.StringIO()
+    builtins.input = _fake
+    try:
+        with contextlib.redirect_stdout(buf):
+            exec(compile(src, "<your code>", "exec"), ns if ns is not None else {"__name__": "__main__"})
+    finally:
+        builtins.input = old
+    return buf.getvalue()
+
+
+def rerun(src, **over):
+    """Execute student source again with top-level assignments replaced by the given constants.
+    Returns the resulting namespace. Output is discarded."""
+    tree = ast.parse(src)
+    for node in tree.body:
+        if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name) and node.targets[0].id in over):
+            node.value = ast.Constant(over[node.targets[0].id])
+    ast.fix_missing_locations(tree)
+    ns = {"__name__": "__main__"}
+    with contextlib.redirect_stdout(io.StringIO()):
+        exec(compile(tree, "<your code>", "exec"), ns)
+    return ns
+
+
+def count_defs(src):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return 0
+    return sum(isinstance(n, ast.FunctionDef) for n in ast.walk(tree))
+
+
+def count_classes(src):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return 0
+    return sum(isinstance(n, ast.ClassDef) for n in ast.walk(tree))
+
+
+def _format_error(exc, code):
+    lines = code.split("\n")
+    if isinstance(exc, SyntaxError):
+        ln = exc.lineno
+        msg = "SyntaxError: " + str(exc.msg)
+        if ln and 1 <= ln <= len(lines):
+            msg += "\n  on line %d: %s" % (ln, lines[ln - 1].strip())
+        return msg
+    tb = traceback.TracebackException.from_exception(exc)
+    ln = None
+    for fs in tb.stack:
+        if fs.filename == "<your code>":
+            ln = fs.lineno
+    msg = "".join(tb.format_exception_only()).strip()
+    if ln and 1 <= ln <= len(lines):
+        msg += "\n  on line %d: %s" % (ln, lines[ln - 1].strip())
+    return msg
+
+
+def _make_input(stdin_lines, out):
+    queue = list(stdin_lines)
+
+    def _input(prompt=""):
+        out.write(str(prompt))
+        if not queue:
+            raise EOFError("input() ran out of lines. Type one value per line in the Input box under the code.")
+        val = queue.pop(0)
+        out.write(val + "\n")
+        return val
+
+    return _input
+
+
+def _exec_code(code, ns, out):
+    tree = ast.parse(code, "<your code>", "exec")
+    last = None
+    if tree.body and isinstance(tree.body[-1], ast.Expr):
+        last = ast.Expression(tree.body.pop().value)
+    exec(compile(tree, "<your code>", "exec"), ns)
+    if last is not None:
+        val = eval(compile(last, "<your code>", "eval"), ns)
+        if val is not None:
+            out.write(repr(val) + "\n")
+
+
+def _collect_images():
+    imgs = []
+    if "matplotlib.pyplot" in sys.modules:
+        import matplotlib.pyplot as plt
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", dpi=100, bbox_inches="tight")
+            imgs.append(base64.b64encode(buf.getvalue()).decode("ascii"))
+        plt.close("all")
+    return imgs
+
+
+def reset_lecture():
+    _LECTURE_NS.clear()
+    _LECTURE_NS["__name__"] = "__main__"
+
+
+def run_cell(req_json):
+    req = json.loads(req_json)
+    code = req.get("code", "")
+    mode = req.get("mode", "fresh")
+    stdin_lines = req.get("stdin") or []
+    tests = req.get("tests")
+    ns = _LECTURE_NS if mode == "lecture" else {"__name__": "__main__"}
+    importlib.invalidate_caches()
+    out = _Capped()
+    err = None
+    real_input = builtins.input
+    builtins.input = _make_input(stdin_lines, out)
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
+            try:
+                random.seed()
+                _exec_code(code, ns, out)
+            except BaseException as exc:
+                if isinstance(exc, KeyboardInterrupt):
+                    raise
+                err = _format_error(exc, code)
+    finally:
+        builtins.input = real_input
+    result = {"stdout": out.getvalue(), "error": err, "images": [], "tests": None}
+    try:
+        result["images"] = _collect_images()
+    except Exception as exc:
+        result["stdout"] += "\n(Plot could not be drawn: %s)" % exc
+    if tests is not None:
+        result["tests"] = _run_tests(tests, ns, code, err, out.getvalue())
+    return json.dumps(result)
+
+
+def _run_tests(tests, ns, code, err, stdout_text):
+    items = tests.get("items", [])
+    results = []
+    if err is not None:
+        for label, _expr, hint in items:
+            results.append({"label": label, "ok": False, "msg": "Fix the error above first."})
+        return results
+    env = ns
+    helpers = {
+        "approx": approx, "out": stdout_text, "src": code, "ast": ast,
+        "uses_node": uses_node, "calls_name": calls_name,
+        "count_defs": count_defs, "run_with": run_with, "rerun": rerun, "count_classes": count_classes, "line_has": line_has,
+        "math": math, "random": random, "io": io, "_in_tests": True,
+    }
+    _missing = object()
+    saved = {k: env.get(k, _missing) for k in helpers}
+    env.update(helpers)
+    sink = _Capped()
+    try:
+        setup = tests.get("setup")
+        if setup:
+            try:
+                with contextlib.redirect_stdout(sink):
+                    exec(compile(setup, "<tests>", "exec"), env)
+            except BaseException as exc:
+                reason = "Could not run the checks: %s: %s" % (type(exc).__name__, exc)
+                return [{"label": l, "ok": False, "msg": reason} for l, _e, _h in items]
+        for label, expr, hint in items:
+            try:
+                with contextlib.redirect_stdout(sink):
+                    ok = bool(eval(compile(expr, "<tests>", "eval"), env))
+                results.append({"label": label, "ok": ok, "msg": "" if ok else hint})
+            except BaseException as exc:
+                if isinstance(exc, KeyboardInterrupt):
+                    raise
+                results.append({"label": label, "ok": False,
+                                "msg": "%s (%s: %s)" % (hint, type(exc).__name__, exc)})
+    finally:
+        for k, v in saved.items():
+            if v is _missing:
+                env.pop(k, None)
+            else:
+                env[k] = v
+    return results
+</script>
+<script id="worker-src" type="text/plain">
+let py = null;
+self.onmessage = async function (e) {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.base + 'pyodide.js');
+      py = await loadPyodide({ indexURL: m.base });
+      py.runPython(m.harness);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'initerror', message: String(err) });
+    }
+    return;
+  }
+  if (m.type === 'reset') {
+    try { py.runPython('reset_lecture()'); } catch (err) {}
+    postMessage({ type: 'resetdone' });
+    return;
+  }
+  if (m.type === 'run') {
+    try {
+      postMessage({ type: 'status', text: 'Loading packages if needed...' });
+      const quiet = { messageCallback: function () {}, errorCallback: function () {} };
+      await py.loadPackagesFromImports(m.code, quiet);
+      if (m.tests && m.tests.setup) { await py.loadPackagesFromImports(m.tests.setup, quiet); }
+      postMessage({ type: 'started' });
+      py.globals.set('_req_json', JSON.stringify({ code: m.code, stdin: m.stdin, mode: m.mode, tests: m.tests }));
+      const res = py.runPython('run_cell(_req_json)');
+      postMessage({ type: 'result', result: JSON.parse(res) });
+    } catch (err) {
+      postMessage({ type: 'error', message: String(err) });
+    }
+  }
+};
+</script>
+<script>
+(function () {
+'use strict';
+var D = JSON.parse(document.getElementById('data').textContent);
+var HARNESS = document.getElementById('harness').textContent;
+var WORKER_SRC = document.getElementById('worker-src').textContent;
+var KEY = 'pyeng-' + D.course_id + '-w' + D.num;
+
+/* ---------- storage ---------- */
+var mem = null;
+function loadState() {
+  try { var s = localStorage.getItem(KEY); if (s) { return JSON.parse(s); } } catch (e) {}
+  return mem || {};
+}
+var S = loadState();
+S.name = S.name || ''; S.lecDone = S.lecDone || {}; S.checks = S.checks || {};
+S.code = S.code || {}; S.lab = S.lab || {}; S.quiz = S.quiz || {};
+function save() { mem = S; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- dom helpers ---------- */
+function h(tag, attrs, kids) {
+  var n = document.createElement(tag);
+  if (attrs) { for (var k in attrs) {
+    if (k === 'class') { n.className = attrs[k]; }
+    else if (k === 'html') { n.innerHTML = attrs[k]; }
+    else if (k === 'text') { n.textContent = attrs[k]; }
+    else if (k.slice(0, 2) === 'on') { n.addEventListener(k.slice(2), attrs[k]); }
+    else { n.setAttribute(k, attrs[k]); }
+  } }
+  if (kids) { kids.forEach(function (c) { if (c) { n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); } }); }
+  return n;
+}
+
+/* ---------- python runner ---------- */
+var Py = (function () {
+  var worker = null, ready = false, current = null, queue = [], timer = null, nextId = 1;
+  var stopBtn = document.getElementById('stopbtn');
+  var statusEl = document.getElementById('pystatus');
+  function status(t) { statusEl.textContent = t; }
+  function start() {
+    var blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    worker = new Worker(URL.createObjectURL(blob));
+    ready = false;
+    worker.onmessage = onMsg;
+    worker.onerror = function (e) { finish(failure('The Python worker crashed: ' + (e.message || 'unknown error'))); };
+    worker.postMessage({ type: 'init', harness: HARNESS, base: D.pyodide_base });
+    status('Starting Python (the first start takes 10 to 30 seconds)...');
+  }
+  function kill() {
+    if (worker) { worker.terminate(); worker = null; }
+    ready = false; clearTimer();
+  }
+  function failure(msg, req) {
+    var r = { stdout: '', error: msg, images: [], tests: null };
+    if (req && req.tests) {
+      r.tests = req.tests.items.map(function (it) { return { label: it[0], ok: false, msg: 'No result.' }; });
+    }
+    return r;
+  }
+  function clearTimer() { if (timer) { clearTimeout(timer); timer = null; } stopBtn.hidden = true; }
+  function armTimer() {
+    clearTimer(); stopBtn.hidden = false;
+    var secs = (current && current.req.timeout) || 20;
+    timer = setTimeout(function () {
+      kill();
+      finish(failure('Stopped after ' + secs + ' seconds. Look for a loop that never ends. Python restarted, so run earlier cells again.', current && current.req));
+      start();
+    }, secs * 1000);
+  }
+  function finish(result) {
+    var c = current; current = null; clearTimer();
+    if (c) { c.resolve(result); }
+    status(ready ? 'Python ready' : 'Python restarting...');
+    pump();
+  }
+  function onMsg(e) {
+    var m = e.data;
+    if (m.type === 'ready') { ready = true; status('Python ready'); pump(); }
+    else if (m.type === 'initerror') {
+      kill();
+      status('Python could not start');
+      var q = queue.slice(); queue = [];
+      if (current) { q.unshift(current); current = null; }
+      q.forEach(function (c) { c.resolve(failure('Python could not start. It needs an internet connection to load. Reload the page and try again. Details: ' + m.message, c.req)); });
+    }
+    else if (m.type === 'status') { status(m.text); }
+    else if (m.type === 'started') { status('Running...'); armTimer(); }
+    else if (m.type === 'result') { finish(m.result); }
+    else if (m.type === 'error') { finish(failure('Python error: ' + m.message, current && current.req)); }
+    else if (m.type === 'resetdone') { status('Python session reset'); }
+  }
+  function pump() {
+    if (!ready || current || !queue.length) { return; }
+    current = queue.shift();
+    status('Preparing...');
+    stopBtn.hidden = false;
+    worker.postMessage({ type: 'run', code: current.req.code, stdin: current.req.stdin || [], mode: current.req.mode, tests: current.req.tests || null });
+  }
+  stopBtn.addEventListener('click', function () {
+    if (!current) { return; }
+    kill();
+    finish(failure('Stopped. Python restarted, so run earlier cells again.', current.req));
+    start();
+  });
+  return {
+    run: function (req) {
+      return new Promise(function (resolve) {
+        queue.push({ id: nextId++, req: req, resolve: resolve });
+        if (!worker) { start(); } else { pump(); }
+      });
+    },
+    reset: function () { if (worker && ready) { worker.postMessage({ type: 'reset' }); } }
+  };
+})();
+
+/* ---------- result rendering ---------- */
+function renderResult(box, r, opts) {
+  box.innerHTML = '';
+  if (r.stdout) { box.appendChild(h('pre', { class: 'stdout', text: r.stdout.replace(/\n$/, '') })); }
+  if (r.error) { box.appendChild(h('div', { class: 'err', role: 'alert' }, [h('strong', { text: 'Error' }), h('pre', { text: r.error })])); }
+  (r.images || []).forEach(function (b64) { box.appendChild(h('img', { src: 'data:image/png;base64,' + b64, alt: 'Plot produced by your code' })); });
+  if (!r.stdout && !r.error && !(r.images && r.images.length) && !(opts && opts.quietEmpty)) {
+    box.appendChild(h('p', { class: 'small', text: 'Ran with no output. Use print() to see values.' }));
+  }
+  if (r.tests) {
+    var ul = h('ul', { class: 'tests' });
+    r.tests.forEach(function (t) {
+      ul.appendChild(h('li', null, [
+        h('span', { class: 'badge ' + (t.ok ? 'pass' : 'fail'), text: t.ok ? 'PASS' : 'FAIL' }),
+        h('span', { text: t.label + (t.ok || !t.msg ? '' : ' Hint: ' + t.msg) })
+      ]));
+    });
+    box.appendChild(ul);
+  }
+}
+
+/* ---------- code cell ---------- */
+function codeCell(o) {
+  var wrap = h('div', { class: 'cell' });
+  var ta = h('textarea', { class: 'code', spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', 'aria-label': o.label || 'Python code editor' });
+  ta.value = (S.code[o.key] !== undefined) ? S.code[o.key] : o.code;
+  function fit() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 4, 640) + 'px'; }
+  var stdinWrap = h('div', { class: 'stdin' });
+  var stdinBox = h('textarea', { class: 'stdin-box', spellcheck: 'false', 'aria-label': 'Input lines for input() calls' });
+  var stdinKey = o.key + ':stdin';
+  stdinBox.value = (S.code[stdinKey] !== undefined) ? S.code[stdinKey] : (o.stdin || []).join('\n');
+  stdinWrap.appendChild(h('label', { text: 'Input box: type one line per input() call, in order.' }));
+  stdinWrap.appendChild(stdinBox);
+  function syncStdin() { stdinWrap.hidden = ta.value.indexOf('input(') === -1; }
+  var out = h('div', { class: 'out', 'aria-live': 'polite' });
+  var runBtn = h('button', { class: 'btn primary', text: o.tests ? 'Run' : 'Run cell' });
+  var checkBtn = o.tests ? h('button', { class: 'btn', text: 'Check my work' }) : null;
+  var resetBtn = h('button', { class: 'btn', text: 'Reset code' });
+  var hintBtn = (o.hint) ? h('button', { class: 'btn', text: 'Show hint' }) : null;
+  var stale = h('span', { class: 'badge warn', text: 'Edited since last check', hidden: '' });
+  stale.hidden = true;
+  function go(withTests) {
+    var req = { code: ta.value, stdin: stdinBox.value ? stdinBox.value.split('\n') : [], mode: o.mode, timeout: o.timeout || 20 };
+    if (withTests) { req.tests = o.tests; }
+    runBtn.disabled = true; if (checkBtn) { checkBtn.disabled = true; }
+    out.innerHTML = ''; out.appendChild(h('p', { class: 'small', text: 'Working...' }));
+    Py.run(req).then(function (r) {
+      runBtn.disabled = false; if (checkBtn) { checkBtn.disabled = false; }
+      renderResult(out, r);
+      if (withTests && o.onCheck) { o.onCheck(r); stale.hidden = true; }
+    });
+  }
+  runBtn.addEventListener('click', function () { go(false); });
+  if (checkBtn) { checkBtn.addEventListener('click', function () { go(true); }); }
+  resetBtn.addEventListener('click', function () {
+    if (ta.value !== o.code && !confirm('Replace your code with the starting code?')) { return; }
+    ta.value = o.code; delete S.code[o.key]; save(); fit(); syncStdin();
+  });
+  var hintBox = null;
+  if (hintBtn) { hintBtn.addEventListener('click', function () {
+    if (hintBox) { hintBox.remove(); hintBox = null; hintBtn.textContent = 'Show hint'; return; }
+    hintBox = h('div', { class: 'hint', html: o.hint }); row.after(hintBox); hintBtn.textContent = 'Hide hint';
+  }); }
+  ta.addEventListener('input', function () {
+    S.code[o.key] = ta.value; save(); fit(); syncStdin(); if (o.tests && o.hasResult && o.hasResult()) { stale.hidden = false; }
+  });
+  stdinBox.addEventListener('input', function () { S.code[stdinKey] = stdinBox.value; save(); });
+  ta.addEventListener('keydown', function (e) {
+    if (e.key === 'Tab' && !e.shiftKey) {
+      e.preventDefault();
+      var s = ta.selectionStart, en = ta.selectionEnd;
+      ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(en);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+      ta.dispatchEvent(new Event('input'));
+    } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(false); }
+  });
+  var row = h('div', { class: 'row' }, [runBtn, checkBtn, hintBtn, resetBtn, stale]);
+  wrap.appendChild(ta); wrap.appendChild(stdinWrap); wrap.appendChild(row); wrap.appendChild(out);
+  setTimeout(function () { fit(); syncStdin(); }, 0);
+  wrap.refit = function () { fit(); };
+  return wrap;
+}
+
+/* ---------- multiple choice ---------- */
+function mcq(o) {
+  var box = h('div', { class: o.cls || 'checkq' });
+  box.appendChild(h('div', { class: 'q', html: o.q }));
+  var ul = h('ul', { class: 'opts' });
+  var btns = [];
+  var why = h('div', { class: 'why', hidden: '' }); why.hidden = true;
+  function lock(choice) {
+    btns.forEach(function (b, i) {
+      b.disabled = true;
+      if (i === o.answer) { b.classList.add('right'); }
+      else if (i === choice) { b.classList.add('wrong'); }
+    });
+    var ok = choice === o.answer;
+    why.hidden = false;
+    why.innerHTML = '';
+    why.appendChild(h('strong', { text: ok ? 'Correct. ' : 'Not quite. ' }));
+    why.appendChild(h('span', { html: o.why }));
+  }
+  o.options.forEach(function (t, i) {
+    var b = h('button', { type: 'button', html: t });
+    b.addEventListener('click', function () { if (o.saved === undefined || o.saved === null) { o.onAnswer(i); } lock(i); });
+    btns.push(b); ul.appendChild(h('li', null, [b]));
+  });
+  box.appendChild(ul); box.appendChild(why);
+  if (o.saved !== undefined && o.saved !== null) { lock(o.saved); }
+  return box;
+}
+
+/* ---------- overview ---------- */
+var tiles = {};
+function renderOverview() {
+  var p = document.getElementById('panel-overview');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'hook', html: '<strong>Why this week matters.</strong> ' + D.hook }));
+  p.appendChild(h('h2', { text: 'Progress' }));
+  var g = h('div', { class: 'grid' });
+  [['lecture', 'Lecture sections done'], ['lab', 'Lab score'], ['quiz', 'Quiz score']].forEach(function (x) {
+    var big = h('div', { class: 'big', text: '0' });
+    tiles[x[0]] = big;
+    g.appendChild(h('div', { class: 'tile' }, [big, h('div', { class: 'lbl', text: x[1] })]));
+  });
+  p.appendChild(g);
+  p.appendChild(h('h2', { text: 'Learning objectives' }));
+  p.appendChild(h('p', { text: 'After this week you can:' }));
+  var ul = h('ul'); D.objectives.forEach(function (t) { ul.appendChild(h('li', { html: t })); }); p.appendChild(ul);
+  p.appendChild(h('h2', { text: 'Time plan' }));
+  p.appendChild(h('p', { html: 'Lecture: about ' + D.lecture_minutes + ' minutes of reading and coding. Lab: about ' + D.lab_minutes + ' minutes. Quiz: about ' + D.quiz_minutes + ' minutes. Take a short break between sections.' }));
+  p.appendChild(h('h2', { text: 'This week’s lab' }));
+  p.appendChild(h('p', { html: D.lab.summary }));
+  p.appendChild(h('h2', { text: 'How this page works' }));
+  var how = h('ul');
+  [
+    'Python runs inside your browser. Nothing to install. The first run takes 10 to 30 seconds while Python loads; later runs are fast.',
+    'Every code cell is editable. Change values, break things, and run again. Press Ctrl+Enter (Command+Enter on Mac) in a cell to run it.',
+    'Cells in the Lecture tab share one Python session, so a variable made in one cell is available in the next. Use Reset Python session to start clean.',
+    'Your code and answers save in this browser on this device. Clearing site data erases them. Use the report in the Lab tab to submit your work.',
+    'If a cell runs more than 20 seconds, Python stops it. That usually means a loop that never ends.'
+  ].forEach(function (t) { how.appendChild(h('li', { text: t })); });
+  p.appendChild(how);
+}
+
+/* ---------- lecture ---------- */
+function updateLecture() {
+  var n = D.lecture.length, done = D.lecture.filter(function (_s, i) { return S.lecDone[i]; }).length;
+  var bar = document.getElementById('lecbar'); if (bar) { bar.firstChild.style.width = (100 * done / n) + '%'; }
+  var t = document.getElementById('lectext'); if (t) { t.textContent = done + ' of ' + n + ' sections complete'; }
+  tiles.lecture.textContent = done + '/' + n;
+}
+function renderLecture() {
+  var p = document.getElementById('panel-lecture');
+  p.innerHTML = '';
+  var top = h('div', { class: 'row' }, [
+    h('span', { id: 'lectext', class: 'small' }),
+    h('span', { class: 'grow', style: 'flex:1' }),
+    h('button', { class: 'btn', text: 'Reset Python session', onclick: function () { Py.reset(); } })
+  ]);
+  p.appendChild(top);
+  p.appendChild(h('div', { class: 'bar', id: 'lecbar' }, [h('span')]));
+  D.lecture.forEach(function (s, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: 'Section ' + (i + 1) + ' of ' + D.lecture.length + ', about ' + s.minutes + ' minutes' }));
+    card.appendChild(h('h3', { text: s.title }));
+    card.appendChild(h('div', { html: s.html }));
+    s.cells.forEach(function (c, j) {
+      if (c.note) { card.appendChild(h('p', { class: 'small', html: c.note })); }
+      card.appendChild(codeCell({ key: 'lec' + i + '_' + j, code: c.code, stdin: c.stdin, mode: 'lecture', label: 'Code for section ' + (i + 1) + ', cell ' + (j + 1) }));
+    });
+    if (s.check) {
+      var id = 'c' + i;
+      card.appendChild(mcq({ q: s.check.q, options: s.check.options, answer: s.check.answer, why: s.check.why, saved: S.checks[id], onAnswer: function (k) { S.checks[id] = k; save(); } }));
+    }
+    var cb = h('input', { type: 'checkbox', id: 'done' + i });
+    cb.checked = !!S.lecDone[i];
+    cb.addEventListener('change', function () { S.lecDone[i] = cb.checked; save(); updateLecture(); });
+    card.appendChild(h('div', { class: 'done-row' }, [cb, h('label', { for: 'done' + i, text: 'Mark this section complete' })]));
+    p.appendChild(card);
+  });
+  p.appendChild(h('h2', { text: 'Week summary' }));
+  p.appendChild(h('div', { class: 'card', html: D.summary }));
+  updateLecture();
+}
+
+/* ---------- lab ---------- */
+function labScore() {
+  var tot = 0, bonus = 0;
+  D.lab.tasks.forEach(function (t) {
+    var r = S.lab[t.id]; if (r && r.total) { var v = t.points * r.passed / r.total; if (t.bonus) { bonus += v; } else { tot += v; } }
+  });
+  return { score: Math.round(tot * 10) / 10, bonus: Math.round(bonus * 10) / 10 };
+}
+function updateLab() {
+  var s = labScore();
+  var max = D.lab.tasks.filter(function (t) { return !t.bonus; }).reduce(function (a, t) { return a + t.points; }, 0);
+  var el = document.getElementById('labscore'); if (el) { el.textContent = s.score + ' / ' + max + (s.bonus ? ' (+' + s.bonus + ' bonus)' : ''); }
+  tiles.lab.textContent = s.score + '/' + max;
+}
+function renderLab() {
+  var p = document.getElementById('panel-lab');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'card', html: D.lab.intro_html }));
+  var sc = h('div', { class: 'row' }, [h('strong', { text: 'Lab score: ' }), h('span', { id: 'labscore', class: 'badge info', text: '0' }), h('span', { class: 'small', text: 'Updates each time you press Check my work.' })]);
+  p.appendChild(sc);
+  D.lab.tasks.forEach(function (t, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: (t.bonus ? 'Bonus challenge' : 'Task ' + (i + 1)) + ', ' + t.points + (t.bonus ? ' bonus points' : ' points') + ', about ' + t.minutes + ' minutes' }));
+    card.appendChild(h('h3', { text: t.title }));
+    card.appendChild(h('div', { html: t.prompt_html }));
+    var res = S.lab[t.id];
+    var note = h('p', { class: 'small', text: res ? ('Last check: ' + res.passed + ' of ' + res.total + ' tests passed.') : 'Not checked yet.' });
+    var cell = codeCell({
+      key: 'lab_' + t.id, code: t.starter, stdin: t.stdin, mode: 'fresh', tests: t.tests, hint: t.hint_html, timeout: 20, label: 'Code for ' + t.title,
+      hasResult: function () { return !!S.lab[t.id]; },
+      onCheck: function (r) {
+        var passed = r.tests ? r.tests.filter(function (x) { return x.ok; }).length : 0;
+        S.lab[t.id] = { passed: passed, total: r.tests ? r.tests.length : 0, at: new Date().toISOString() };
+        save(); note.textContent = 'Last check: ' + passed + ' of ' + S.lab[t.id].total + ' tests passed.'; updateLab();
+      }
+    });
+    card.appendChild(cell); card.appendChild(note);
+    p.appendChild(card);
+  });
+  p.appendChild(h('h2', { text: 'Submit your work' }));
+  var rep = h('div', { class: 'card' });
+  rep.appendChild(h('p', { text: 'Enter your name, then copy the report or download it. Submit it the way your instructor asks. The report lists your scores and your final code for each task.' }));
+  var nm = h('input', { type: 'text', id: 'stname', 'aria-label': 'Your name', placeholder: 'Your name', autocomplete: 'name' });
+  nm.value = S.name;
+  nm.addEventListener('input', function () { S.name = nm.value; save(); });
+  rep.appendChild(h('div', { class: 'field' }, [h('label', { for: 'stname', text: 'Name' }), nm]));
+  var ta = h('textarea', { class: 'report', readonly: '', 'aria-label': 'Report text' });
+  var b1 = h('button', { class: 'btn primary', text: 'Build report', onclick: function () { ta.value = buildReport(); } });
+  var b2 = h('button', { class: 'btn', text: 'Copy report', onclick: function () {
+    ta.value = buildReport(); ta.select();
+    var done = function () { b2.textContent = 'Copied'; setTimeout(function () { b2.textContent = 'Copy report'; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(ta.value).then(done, function () { try { document.execCommand('copy'); done(); } catch (e) {} }); }
+    else { try { document.execCommand('copy'); done(); } catch (e) {} }
+  } });
+  var b3 = h('button', { class: 'btn', text: 'Download .txt', onclick: function () {
+    var txt = buildReport(); ta.value = txt;
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+    a.download = 'week' + D.num + '_report.txt'; document.body.appendChild(a); a.click(); a.remove();
+  } });
+  rep.appendChild(h('div', { class: 'row' }, [b1, b2, b3]));
+  rep.appendChild(ta);
+  p.appendChild(rep);
+  updateLab();
+}
+function quizTally() {
+  var correct = 0, answered = 0;
+  D.quiz.forEach(function (q, i) { var a = S.quiz[i]; if (a !== undefined && a !== null) { answered++; if (a === q.answer) { correct++; } } });
+  return { correct: correct, answered: answered, total: D.quiz.length };
+}
+function buildReport() {
+  var L = [], s = labScore(), q = quizTally();
+  var max = D.lab.tasks.filter(function (t) { return !t.bonus; }).reduce(function (a, t) { return a + t.points; }, 0);
+  var lec = D.lecture.filter(function (_s, i) { return S.lecDone[i]; }).length;
+  L.push('Course: ' + D.course_title);
+  L.push('Week ' + D.num + ': ' + D.title);
+  L.push('Name: ' + (S.name || '(not entered)'));
+  L.push('Generated: ' + new Date().toLocaleString());
+  L.push('');
+  L.push('Lecture sections marked complete: ' + lec + ' of ' + D.lecture.length);
+  L.push('Lab score (browser autograder): ' + s.score + ' of ' + max + (s.bonus ? ', bonus ' + s.bonus : ''));
+  L.push('Quiz: ' + q.correct + ' correct, ' + q.answered + ' answered, ' + q.total + ' questions');
+  L.push('');
+  D.lab.tasks.forEach(function (t, i) {
+    var r = S.lab[t.id];
+    L.push('==== ' + (t.bonus ? 'Bonus' : 'Task ' + (i + 1)) + ': ' + t.title + ' (' + (r ? r.passed + '/' + r.total + ' tests' : 'not checked') + ') ====');
+    L.push(S.code['lab_' + t.id] !== undefined ? S.code['lab_' + t.id] : t.starter);
+    L.push('');
+  });
+  return L.join('\n');
+}
+
+/* ---------- quiz ---------- */
+function updateQuiz() {
+  var q = quizTally();
+  var el = document.getElementById('quizscore');
+  if (el) { el.textContent = q.correct + ' correct of ' + q.answered + ' answered, ' + q.total + ' questions'; }
+  tiles.quiz.textContent = q.correct + '/' + q.total;
+}
+function renderQuiz() {
+  var p = document.getElementById('panel-quiz');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'card', html: D.quiz_intro_html }));
+  p.appendChild(h('div', { class: 'row' }, [
+    h('strong', { text: 'Score: ' }), h('span', { id: 'quizscore', class: 'badge info' }),
+    h('span', { style: 'flex:1' }),
+    h('button', { class: 'btn', text: 'Reset quiz', onclick: function () {
+      if (!confirm('Clear all quiz answers?')) { return; } S.quiz = {}; save(); renderQuiz();
+    } })
+  ]));
+  D.quiz.forEach(function (q, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: 'Question ' + (i + 1) + ' of ' + D.quiz.length }));
+    card.appendChild(mcq({ cls: 'qbox', q: q.q, options: q.options, answer: q.answer, why: q.why, saved: S.quiz[i], onAnswer: function (k) { S.quiz[i] = k; save(); updateQuiz(); } }));
+    p.appendChild(card);
+  });
+  updateQuiz();
+}
+
+/* ---------- shell ---------- */
+document.getElementById('kicker').textContent = D.course_title + ', Week ' + D.num;
+document.getElementById('title').textContent = D.title;
+document.title = D.course_title + ' Week ' + D.num + ' ' + D.title;
+var chips = document.getElementById('chips');
+[D.lecture_minutes + ' min lecture', D.lab_minutes + ' min lab', D.quiz.length + ' quiz questions'].forEach(function (t) { chips.appendChild(h('li', { text: t })); });
+var tabs = [['overview', 'Overview'], ['lecture', 'Lecture'], ['lab', 'Lab'], ['quiz', 'Quiz']];
+var tl = document.getElementById('tablist');
+tabs.forEach(function (t) {
+  var b = h('button', { role: 'tab', id: 'tab-' + t[0], 'aria-controls': 'panel-' + t[0], 'aria-selected': 'false', text: t[1] });
+  b.addEventListener('click', function () { show(t[0]); });
+  tl.appendChild(b);
+});
+function show(name) {
+  tabs.forEach(function (t) {
+    document.getElementById('panel-' + t[0]).hidden = (t[0] !== name);
+    document.getElementById('tab-' + t[0]).setAttribute('aria-selected', t[0] === name ? 'true' : 'false');
+  });
+  try { history.replaceState(null, '', '#' + name); } catch (e) {}
+  window.scrollTo(0, 0);
+  document.querySelectorAll('#panel-' + name + ' textarea.code').forEach(function (t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight + 4, 640) + 'px'; });
+}
+renderOverview(); renderLecture(); renderLab(); renderQuiz();
+var start = (location.hash || '').replace('#', '');
+show(tabs.some(function (t) { return t[0] === start; }) ? start : 'overview');
+})();
+</script>
+</body>
+</html>

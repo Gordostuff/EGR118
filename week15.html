@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python for Engineers Week 15 Capstone: Requirements, Structure, Self-Checks, and Final Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f0; --card:#ffffff; --ink:#1a1f24; --mute:#59636e; --line:#d9d6cb;
+  --accent:#0a5aa0; --accent-ink:#ffffff; --accent-soft:#e4eef8;
+  --ok:#17692f; --ok-bg:#e5f3e9; --bad:#a82217; --bad-bg:#fcebe8; --warn:#8a5a00; --warn-bg:#fdf3dc;
+  --code-bg:#f0eee6; --out-bg:#e6edf6; --out-ink:#0a2a66;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#11151a; --card:#192028; --ink:#e7ebef; --mute:#9aa6b2; --line:#2c3641;
+    --accent:#5eaeea; --accent-ink:#0b1219; --accent-soft:#17283a;
+    --ok:#6fd08c; --ok-bg:#15301f; --bad:#ff8a7d; --bad-bg:#3a1b18; --warn:#f0c060; --warn-bg:#33290f;
+    --code-bg:#10161c; --out-bg:#e6edf6; --out-ink:#0a2a66;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px}
+.skip{position:absolute;left:-999px}
+.skip:focus{left:8px;top:8px;background:var(--card);padding:8px;z-index:50}
+header.top{padding:28px 0 12px}
+.kicker{font-size:13px;color:var(--mute);letter-spacing:.02em;margin:0 0 4px}
+h1{font-size:clamp(24px,5vw,34px);line-height:1.2;margin:0 0 10px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.chips li{font-size:13px;border:1px solid var(--line);background:var(--card);padding:2px 10px;border-radius:999px;color:var(--mute)}
+nav.tabs{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px;color:var(--mute);cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible,button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.statusbar{position:sticky;top:46px;z-index:15;background:var(--card);border:1px solid var(--line);border-radius:8px;margin:10px 0;padding:6px 12px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--mute)}
+.statusbar .grow{flex:1}
+main{padding:16px 0 80px}
+.panel[hidden]{display:none}
+h2{font-size:22px;margin:24px 0 8px;font-weight:600}
+h3{font-size:18px;margin:0 0 6px;font-weight:600}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 12px;padding-left:22px}
+li{margin:2px 0}
+code{font-family:var(--mono);font-size:.92em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:0 0 16px}
+.card .meta{font-size:13px;color:var(--mute);margin:0 0 8px}
+.hook{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 0 16px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.tile .big{font-size:24px;font-weight:600;font-family:var(--mono)}
+.tile .lbl{font-size:13px;color:var(--mute)}
+.bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden;margin:6px 0 14px}
+.bar>span{display:block;height:100%;background:var(--accent);width:0}
+button.btn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;border-radius:6px;cursor:pointer}
+button.btn:hover{border-color:var(--accent)}
+button.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.cell{margin:12px 0}
+textarea.code{display:block;width:100%;font-family:var(--mono);font-size:14px;line-height:1.5;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px 12px;resize:vertical;tab-size:4;white-space:pre;overflow:auto;min-height:60px}
+.stdin{margin-top:6px}
+.stdin label{font-size:13px;color:var(--mute);display:block}
+textarea.stdin-box{width:100%;font-family:var(--mono);font-size:13px;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-height:48px}
+.out{margin-top:8px}
+pre.stdout{margin:0;background:var(--out-bg);color:var(--out-ink);font-family:var(--mono);font-size:13.5px;padding:10px 12px;border-radius:6px;border:1px solid #b9c8dc;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.err{margin-top:8px;border:1px solid var(--bad);background:var(--bad-bg);color:var(--bad);border-radius:6px;padding:8px 12px;font-size:14px}
+.err pre{margin:4px 0 0;font-family:var(--mono);font-size:13px;white-space:pre-wrap;color:inherit}
+.out img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin-top:8px;border:1px solid var(--line)}
+.tests{list-style:none;margin:8px 0 0;padding:0}
+.tests li{display:flex;gap:10px;align-items:flex-start;padding:4px 0;font-size:14px;border-bottom:1px dashed var(--line)}
+.badge{font-family:var(--mono);font-size:12px;font-weight:500;padding:1px 8px;border-radius:4px;flex:none}
+.badge.pass{background:var(--ok-bg);color:var(--ok)}
+.badge.fail{background:var(--bad-bg);color:var(--bad)}
+.badge.info{background:var(--accent-soft);color:var(--accent)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.hint{margin:8px 0;padding:8px 12px;background:var(--warn-bg);color:var(--ink);border-radius:6px;font-size:14px;border:1px solid var(--line)}
+.q{margin:0 0 6px;font-weight:500}
+.q p{margin:0 0 8px}
+.q pre,.card pre{background:var(--code-bg);padding:8px 12px;border-radius:6px;overflow:auto;font-family:var(--mono);font-size:13.5px;font-weight:400;margin:0 0 10px}
+.q pre code,.card pre code{background:none;padding:0}
+.opts{list-style:none;padding:0;margin:0}
+.opts button{display:block;width:100%;text-align:left;font:inherit;font-size:15px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:6px 0;cursor:pointer}
+.opts button:hover:not(:disabled){border-color:var(--accent)}
+.opts button.right{border-color:var(--ok);background:var(--ok-bg)}
+.opts button.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opts button:disabled{cursor:default}
+.why{margin-top:8px;font-size:14px;padding:8px 12px;border-radius:6px;background:var(--accent-soft)}
+.checkq{margin:14px 0 4px;padding:12px;border:1px dashed var(--line);border-radius:8px}
+.done-row{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px}
+.field{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.field input{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);min-width:240px}
+textarea.report{width:100%;min-height:200px;font-family:var(--mono);font-size:12.5px;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px}
+table{border-collapse:collapse;width:100%;margin:0 0 12px;font-size:14px}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--code-bg)}
+.small{font-size:13px;color:var(--mute)}
+@media (max-width:600px){ .field input{min-width:0;width:100%} .statusbar{top:44px} }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+  <p class="kicker" id="kicker"></p>
+  <h1 id="title"></h1>
+  <ul class="chips" id="chips"></ul>
+</div></header>
+<nav class="tabs" aria-label="Sections"><div class="wrap" role="tablist" id="tablist"></div></nav>
+<main id="main"><div class="wrap">
+  <div class="statusbar" id="statusbar" role="status" aria-live="polite">
+    <span id="pystatus">Python starts when you run your first cell.</span>
+    <span class="grow"></span>
+    <button class="btn" id="stopbtn" hidden>Stop</button>
+  </div>
+  <section class="panel" id="panel-overview"></section>
+  <section class="panel" id="panel-lecture" hidden></section>
+  <section class="panel" id="panel-lab" hidden></section>
+  <section class="panel" id="panel-quiz" hidden></section>
+</div></main>
+
+<script id="data" type="application/json">{"course_id": "pyeng", "course_title": "Python for Engineers", "pyodide_base": "https://cdn.jsdelivr.net/pyodide/v0.27.8/full/", "num": 15, "title": "Capstone: Requirements, Structure, Self-Checks, and Final Review", "hook": "You can now read data, calculate, plot, simulate, and model parts with classes. A capstone brings those pieces together in one tool that someone else could use. This week you learn how engineers turn a vague request into testable requirements, how to structure a program, how to make Python check your own code, and how to write tests that actually catch bugs. The lab builds a battery discharge analyzer from requirements to test suite, and the final quiz reviews the whole course.", "objectives": ["turn a project request into testable requirements", "plan a program as data, functions, classes, a plot, and a report", "write docstrings and use <code>ast<\/code> to check code structure", "write a test function that passes good code and fails buggy code", "present results with units, honest limits, and a clear figure", "review the main ideas of weeks 1 to 14 for the final quiz"], "summary": "<ul><li>A capstone is a small, complete tool: load data, validate, model, analyze, plot, report.<\/li><li>Write requirements as condition, action, number. Each edge case is a requirement and a test.<\/li><li>Keep functions short, pass data through arguments, and return results.<\/li><li>Docstrings say what a function returns. <code>ast<\/code> can check structure: functions, docstrings, asserts.<\/li><li>A good test suite passes correct code and fails buggy code. Catch crashes with <code>try<\/code> and <code>except<\/code>.<\/li><li>Reports state the answer first, give units, show a labeled figure, and name assumptions and limits.<\/li><li>Plan in passes. Get a small version working end to end early.<\/li><\/ul>", "lecture": [{"title": "The capstone and the course map", "minutes": 15, "html": "<p>A capstone project is a small tool that does a real engineering job from start to finish. Typical choices:<\/p>\n<ul><li>Battery or motor analyzer: load test data, compute capacity or efficiency, plot, rank units.<\/li><li>Sensor calibration tool: fit a curve, report error, flag bad readings.<\/li><li>Tolerance study: simulate part variation and report the pass rate.<\/li><li>Thermal or circuit model: simulate over time, compare to a limit.<\/li><li>Truss or beam calculator: solve forces and plot deflection.<\/li><\/ul>\n<p>Each one uses ideas from the whole course: variables and arithmetic, decisions, loops, functions, collections, files and errors, NumPy, plots, pandas, numerical methods, simulation, and classes.<\/p>", "cells": [{"code": "course = {\n    1: \"expressions\", 2: \"strings and input\", 3: \"decisions\", 4: \"loops\",\n    5: \"functions\", 6: \"collections\", 7: \"files and errors\", 8: \"debugging\",\n    9: \"NumPy\", 10: \"plots\", 11: \"pandas\", 12: \"numerical methods\",\n    13: \"simulation\", 14: \"classes\", 15: \"capstone\",\n}\nfor week, topic in course.items():\n    if week >= 9:\n        print(week, topic)\n", "stdin": null, "note": null}], "check": {"q": "Which statement describes a good capstone project?", "options": ["A small tool that takes data in, computes results, and reports them", "A long program that uses every Python feature", "A program with no inputs", "A copy of a lecture example"], "answer": 0, "why": "The goal is a complete, useful pipeline. Using many features is not the goal."}}, {"title": "Requirements you can test", "minutes": 20, "html": "<p>A <strong>requirement<\/strong> says what the tool must do. A good one can be checked with a test. Compare:<\/p>\n<ul><li>Weak: \"The program should calculate battery capacity correctly.\"<\/li><li>Testable: \"Given constant current in amps and a time to cutoff in minutes, the program shall report capacity in amp-hours as current times minutes divided by 60. For 1.0 A and 69 minutes it shall report 1.15 Ah.\"<\/li><\/ul>\n<p>Write each requirement as: <strong>condition, action, number<\/strong>. List the edge cases: missing data, the cutoff never reached, a cutoff outside the valid range. Each edge case becomes a requirement and a test.<\/p>", "cells": [{"code": "requirements = [\n    (\"R1\", \"Report capacity in Ah for each cell\", \"1.0 A, 69 min -> 1.15 Ah\"),\n    (\"R2\", \"Report None when the cutoff is never reached\", \"min voltage 3.8 V, cutoff 3.4 V -> None\"),\n    (\"R3\", \"Reject a cutoff outside 2.5 to 4.2 V\", \"cutoff 9 -> ValueError\"),\n]\nfor rid, text, example in requirements:\n    print(rid + \":\", text, \"|\", example)\nprint(len(requirements), \"requirements\")\n", "stdin": null, "note": null}], "check": {"q": "Which requirement can be tested?", "options": ["The program should be fast", "The program shall be easy to use", "The program shall report 1.15 Ah for 1.0 A over 69 minutes", "The program should work well"], "answer": 2, "why": "It names an input and an exact expected output."}}, {"title": "Structure: data, functions, classes, plots", "minutes": 15, "html": "<p>Plan before typing. Sketch the pipeline:<\/p>\n<ol><li><strong>Load<\/strong>: read the data into a table (pandas).<\/li><li><strong>Validate<\/strong>: check ranges, raise <code>ValueError<\/code> with a clear message.<\/li><li><strong>Model<\/strong>: a class for the thing you measure, with methods for the calculations.<\/li><li><strong>Analyze<\/strong>: functions that use the model for each unit and rank them.<\/li><li><strong>Plot<\/strong>: one clear figure with labeled axes and units.<\/li><li><strong>Report<\/strong>: a printed summary with numbers and units.<\/li><\/ol>\n<p>Keep each function short and give it one job. Pass data in through arguments and return results, so each function can be tested alone.<\/p>", "cells": [{"code": "import numpy as np\nimport pandas as pd\nimport io\n\nCSV = \"\"\"cell,minute,voltage_v,current_a\nX1,0,4.10,1.0\nX1,15,3.95,1.0\nX1,30,3.82,1.0\nX1,45,3.70,1.0\nX1,60,3.55,1.0\nX1,75,3.30,1.0\nY2,0,4.05,1.0\nY2,15,3.88,1.0\nY2,30,3.72,1.0\nY2,45,3.56,1.0\nY2,60,3.35,1.0\nY2,75,3.05,1.0\n\"\"\"\n\nclass DischargeTest:\n    \"\"\"One constant-current discharge test of a battery cell.\"\"\"\n\n    def __init__(self, cell, minutes, volts, current_a):\n        self.cell = cell\n        self.minutes = list(minutes)\n        self.volts = list(volts)\n        self.current_a = current_a\n\n    def time_to_cutoff(self, cutoff):\n        if self.volts[0] <= cutoff:\n            return self.minutes[0]\n        if self.volts[-1] > cutoff:\n            return None\n        return float(np.interp(cutoff, self.volts[::-1], self.minutes[::-1]))\n\n    def capacity_ah(self, cutoff):\n        t = self.time_to_cutoff(cutoff)\n        if t is None:\n            return None\n        return self.current_a * t / 60\n\ndef load_tests(csv_text):\n    df = pd.read_csv(io.StringIO(csv_text))\n    found = {}\n    for name, g in df.groupby(\"cell\"):\n        found[name] = DischargeTest(name, g[\"minute\"].tolist(), g[\"voltage_v\"].tolist(), float(g[\"current_a\"].iloc[0]))\n    return found\n\ntests = load_tests(CSV)\nfor name, t in tests.items():\n    print(name, round(t.time_to_cutoff(3.4), 1), \"min\", round(t.capacity_ah(3.4), 3), \"Ah\")\n", "stdin": null, "note": "This is the model used in the lab. Read each method and check it against the requirements."}], "check": {"q": "Why should functions return results instead of printing them?", "options": ["A returned value can be tested, reused, and plotted", "Printing is not allowed in functions", "Returned values run faster", "Printed values cannot be seen"], "answer": 0, "why": "A test can compare a returned value with an expected one. Printed text is harder to check."}}, {"title": "Docstrings and names", "minutes": 15, "html": "<p>A <strong>docstring<\/strong> is a string at the start of a function or class that says what it does. Write one line for what it returns, then any rules or units. Use names that carry meaning: <code>capacity_ah<\/code> says more than <code>c<\/code>.<\/p>\n<p>Read a docstring with <code>help(func)<\/code> or <code>func.__doc__<\/code>.<\/p>", "cells": [{"code": "def capacity_ah(current_a, minutes):\n    \"\"\"Return capacity in amp-hours for a constant current and a time in minutes.\"\"\"\n    return current_a * minutes / 60\n\nprint(capacity_ah.__doc__)\nprint(capacity_ah(1.0, 69))\n", "stdin": null, "note": null}], "check": {"q": "Where does a docstring go?", "options": ["In a comment above the function", "On the line after the function ends", "As the first statement inside the function or class", "In the function's name"], "answer": 2, "why": "Python reads the string at the top of the body as the docstring."}}, {"title": "Self-checks with ast", "minutes": 15, "html": "<p>Python can read its own source. The <code>ast<\/code> module parses code into a tree, and you can walk the tree to ask questions: how many functions are there, does every function have a docstring, is there an <code>assert<\/code>? This is how the lab checks in this course look at your code.<\/p>\n<p>Write a <code>self_check(src)<\/code> function that returns a checklist, then run it on your project before you submit.<\/p>", "cells": [{"code": "import ast\n\ndef self_check(src):\n    tree = ast.parse(src)\n    funcs = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]\n    return {\n        \"3 or more functions\": len(funcs) >= 3,\n        \"every function has a docstring\": all(ast.get_docstring(f) for f in funcs),\n        \"has an assert\": any(isinstance(n, ast.Assert) for n in ast.walk(tree)),\n    }\n\ngood = '''\ndef a():\n    \"\"\"One.\"\"\"\n    return 1\ndef b():\n    \"\"\"Two.\"\"\"\n    return 2\ndef c():\n    \"\"\"Three.\"\"\"\n    return 3\nassert a() + b() == c()\n'''\nbad = \"def a():\\n    return 1\\n\"\n\nprint(self_check(good))\nprint(self_check(bad))\n", "stdin": null, "note": "The second source fails all three checks."}], "check": {"q": "What does <code>ast.parse(src)<\/code> return?", "options": ["A tree that represents the structure of the code", "A compiled program file", "A list of the variable values", "The output of running the code"], "answer": 0, "why": "<code>ast<\/code> reads the code without running it and gives you a tree to inspect."}}, {"title": "Tests that catch bugs", "minutes": 20, "html": "<p>A test suite is good if it passes correct code <strong>and<\/strong> fails buggy code. Passing correct code alone proves little: a test that always passes is useless. Try your tests on versions of the function with deliberate bugs. If a bug survives, you need another test.<\/p>\n<p>Choose cases that each target a different failure: a normal case, an edge, and a missing-data case. Wrap each call in <code>try<\/code> and <code>except<\/code> so a crash counts as a failed test instead of stopping the suite.<\/p>", "cells": [{"code": "def ttc(minutes, volts, cutoff):\n    if volts[0] <= cutoff:\n        return minutes[0]\n    if volts[-1] > cutoff:\n        return None\n    for i in range(1, len(volts)):\n        if volts[i] <= cutoff:\n            v0, v1 = volts[i - 1], volts[i]\n            t0, t1 = minutes[i - 1], minutes[i]\n            return t0 + (v0 - cutoff) / (v0 - v1) * (t1 - t0)\n\ndef ttc_no_interp(minutes, volts, cutoff):\n    for i in range(len(volts)):\n        if volts[i] <= cutoff:\n            return minutes[i]\n    return None\n\ncases = [\n    (\"interpolates\", ([0, 10], [4.0, 3.0], 3.5), 5.0),\n    (\"never reached\", ([0, 10], [4.0, 3.8], 3.5), None),\n    (\"starts below\", ([0, 10], [3.0, 2.5], 3.5), 0),\n]\n\ndef run_checks(fn):\n    failures = []\n    for label, args, expected in cases:\n        try:\n            got = fn(*args)\n        except Exception as exc:\n            failures.append(label + \" crashed: \" + type(exc).__name__)\n            continue\n        if got != expected:\n            failures.append(label + \": expected \" + str(expected) + \" got \" + str(got))\n    return failures\n\nprint(run_checks(ttc))\nprint(run_checks(ttc_no_interp))\n", "stdin": null, "note": "The correct function has no failures. The buggy one fails the interpolation case."}], "check": {"q": "Why test buggy versions of your code?", "options": ["To make the code run faster", "To avoid writing documentation", "To confirm your tests fail when something is wrong", "To increase the number of functions"], "answer": 2, "why": "A test that never fails does not protect you. Buggy versions show whether the tests have teeth."}}, {"title": "Reporting results", "minutes": 15, "html": "<p>The report is what your reader sees. A good one:<\/p>\n<ul><li>States the question and the answer in the first lines.<\/li><li>Gives every number a unit and a sensible number of digits.<\/li><li>Shows one figure with labeled axes, a legend, and a reference line for the limit.<\/li><li>Names the assumptions: constant current, linear interpolation between samples, 3.4 V cutoff.<\/li><li>Says what the data cannot show, for example only two cells were tested.<\/li><\/ul>\n<p>Compare \"Y2 is worse\" with \"Y2 reached the 3.4 V cutoff at 56 minutes (0.94 Ah) and X1 at 69 minutes (1.15 Ah); two cells tested at 1.0 A.\"<\/p>", "cells": [{"code": "caps = {name: t.capacity_ah(3.4) for name, t in tests.items()}\nbest = max(caps, key=caps.get)\nprint(\"Best cell:\", best)\nfor name in sorted(caps):\n    print(f\"  {name}: {caps[name]:.2f} Ah at 1.0 A to a 3.4 V cutoff\")\nprint(\"Assumes linear interpolation between samples; 2 cells tested.\")\n", "stdin": null, "note": null}], "check": {"q": "Which statement belongs in an engineering report?", "options": ["X1 delivered 1.15 Ah at 1.0 A down to a 3.4 V cutoff", "X1 is much better", "X1 delivered a lot of charge", "X1 won"], "answer": 0, "why": "Numbers, units, and conditions let a reader check and reproduce the result."}}, {"title": "Planning and what comes next", "minutes": 15, "html": "<p>Plan the capstone in four passes: (1) requirements and test cases, (2) the smallest version that runs end to end, (3) the full features, (4) the report and polish. Finish pass 2 early; a working small tool is better than an unfinished large one.<\/p>\n<p>Where to go next: more NumPy and pandas for data analysis, SciPy for solvers and filters, Arduino and Raspberry Pi for hardware, and the engineering courses in your program, where these tools become everyday methods.<\/p>", "cells": [{"code": "plan = [\n    (\"Requirements and tests\", 2),\n    (\"Smallest working version\", 3),\n    (\"Full features\", 4),\n    (\"Report and polish\", 3),\n]\nprint(\"Total hours:\", sum(h for _name, h in plan))\nfor name, hours in plan:\n    print(f\"{name:28s}{hours} h\")\n", "stdin": null, "note": null}]}], "lecture_minutes": 130, "lab": {"summary": "A battery discharge analyzer from requirements to tests: input validation, a model class, loading with pandas, a ranked plot, a Monte Carlo pack estimate, and a test suite that catches buggy code.", "intro_html": "<p>You will build the analyzer in pieces. Each task is graded alone, so each starter includes whatever earlier pieces the task needs. The test data is two cells discharged at 1.0 A with a 3.4 V cutoff.<\/p>\n<p>Several tasks ask for functions with exact names. The checks call them with new inputs, so do not hard-code the answers. The last task is a test suite: the checks run it against a correct function and four buggy ones.<\/p>", "tasks": [{"id": "t1", "title": "Validate the cutoff", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>Write <code>parse_cutoff(text)<\/code>. It takes a text value such as <code>\"3.4\"<\/code>, converts it to a float, and returns it. It raises <code>ValueError<\/code> if the text is not a number or if the voltage is outside 2.5 to 4.2 V (inclusive range is valid). Give the function a docstring.<\/p>", "starter": "def parse_cutoff(text):\n    ...\n\nprint(parse_cutoff(\"3.4\"))\n", "hint_html": "<p><code>float(text)<\/code> raises <code>ValueError<\/code> for text that is not a number. After converting, check <code>2.5 &lt;= value &lt;= 4.2<\/code> and <code>raise ValueError(\"...\")<\/code> if it fails. The first statement in the function body can be a string: the docstring.<\/p>", "stdin": null, "tests": {"setup": "\nimport io\nimport math\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\ndef raises(exc, fn, *args):\n    try:\n        fn(*args)\n    except exc:\n        return True\n    except Exception:\n        return False\n    return False\n", "items": [["valid value", "approx(parse_cutoff('3.4'), 3.4)", "Convert with float and return the number."], ["limits are valid", "approx(parse_cutoff('2.5'), 2.5) and approx(parse_cutoff('4.2'), 4.2)", "The range is inclusive."], ["spaces are fine", "approx(parse_cutoff(' 3.6 '), 3.6)", "float() accepts surrounding spaces."], ["text is rejected", "raises(ValueError, parse_cutoff, 'abc')", "float('abc') raises ValueError; let it."], ["too high is rejected", "raises(ValueError, parse_cutoff, '9')", "Raise ValueError when the value is above 4.2."], ["too low is rejected", "raises(ValueError, parse_cutoff, '1.0')", "Raise ValueError when the value is below 2.5."], ["has a docstring", "any(isinstance(n, ast.FunctionDef) and n.name == 'parse_cutoff' and ast.get_docstring(n) is not None for n in ast.walk(ast.parse(src)))", "Put a string as the first statement in the function."]]}}, {"id": "t2", "title": "Discharge model class", "points": 20, "minutes": 25, "bonus": false, "prompt_html": "<p>Write <code>class DischargeTest<\/code> with <code>__init__(self, cell, minutes, volts, current_a)<\/code>, <code>time_to_cutoff(cutoff)<\/code>, and <code>capacity_ah(cutoff)<\/code>. <code>time_to_cutoff<\/code> returns the minute when the voltage reaches the cutoff, found by linear interpolation between samples. If the first voltage is already at or below the cutoff, return the first minute. If the voltage never reaches the cutoff, return <code>None<\/code>. <code>capacity_ah<\/code> returns <code>current_a * time / 60<\/code>, or <code>None<\/code> when the time is <code>None<\/code>.<\/p>", "starter": "import numpy as np\n\nclass DischargeTest:\n    def __init__(self, cell, minutes, volts, current_a):\n        ...\n\n    def time_to_cutoff(self, cutoff):\n        ...\n\n    def capacity_ah(self, cutoff):\n        ...\n\nx1 = DischargeTest(\"X1\", [0, 15, 30, 45, 60, 75], [4.10, 3.95, 3.82, 3.70, 3.55, 3.30], 1.0)\nprint(x1.time_to_cutoff(3.4), x1.capacity_ah(3.4))\n", "hint_html": "<p>Voltage falls with time, so reverse both lists for <code>np.interp<\/code>: <code>np.interp(cutoff, self.volts[::-1], self.minutes[::-1])<\/code>. Handle the two special cases before interpolating.<\/p>", "stdin": null, "tests": {"setup": "\nimport io\nimport math\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\ndef raises(exc, fn, *args):\n    try:\n        fn(*args)\n    except exc:\n        return True\n    except Exception:\n        return False\n    return False\n", "items": [["time to cutoff for X1", "approx(x1.time_to_cutoff(3.4), 69.0)", "Interpolate between 60 min (3.55 V) and 75 min (3.30 V)."], ["capacity for X1", "approx(x1.capacity_ah(3.4), 1.15)", "capacity = current * minutes / 60"], ["second cell", "approx(DischargeTest('Y2', [0, 15, 30, 45, 60, 75], [4.05, 3.88, 3.72, 3.56, 3.35, 3.05], 1.0).time_to_cutoff(3.4), 56.428571, rel=1e-6)", "Use the cell's own lists."], ["current scales capacity", "approx(DischargeTest('Z', [0, 60], [4.0, 3.0], 2.0).capacity_ah(3.5), 1.0)", "Time to cutoff is 30 min; 2.0 A * 0.5 h = 1.0 Ah."], ["never reaches the cutoff", "DischargeTest('Q', [0, 10], [4.0, 3.8], 1.0).time_to_cutoff(3.4) is None and DischargeTest('Q', [0, 10], [4.0, 3.8], 1.0).capacity_ah(3.4) is None", "Return None for both methods."], ["starts below the cutoff", "DischargeTest('Q', [5, 10], [3.0, 2.5], 1.0).time_to_cutoff(3.4) == 5", "Return the first minute."]]}}, {"id": "t3", "title": "Load the test data", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>Write <code>load_tests(csv_text)<\/code>. It reads the CSV text with pandas and returns a dictionary that maps each cell name to a <code>DischargeTest<\/code> (the class is supplied). The current for each cell is the first <code>current_a<\/code> value in its rows.<\/p>", "starter": "import io\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nCSV = \"\"\"cell,minute,voltage_v,current_a\nX1,0,4.10,1.0\nX1,15,3.95,1.0\nX1,30,3.82,1.0\nX1,45,3.70,1.0\nX1,60,3.55,1.0\nX1,75,3.30,1.0\nY2,0,4.05,1.0\nY2,15,3.88,1.0\nY2,30,3.72,1.0\nY2,45,3.56,1.0\nY2,60,3.35,1.0\nY2,75,3.05,1.0\n\"\"\"\n\nclass DischargeTest:\n    \"\"\"One constant-current discharge test of a battery cell.\"\"\"\n\n    def __init__(self, cell, minutes, volts, current_a):\n        self.cell = cell\n        self.minutes = list(minutes)\n        self.volts = list(volts)\n        self.current_a = current_a\n\n    def time_to_cutoff(self, cutoff):\n        if self.volts[0] <= cutoff:\n            return self.minutes[0]\n        if self.volts[-1] > cutoff:\n            return None\n        return float(np.interp(cutoff, self.volts[::-1], self.minutes[::-1]))\n\n    def capacity_ah(self, cutoff):\n        t = self.time_to_cutoff(cutoff)\n        if t is None:\n            return None\n        return self.current_a * t / 60\n\ndef load_tests(csv_text):\n    ...\n\ntests = load_tests(CSV)\nprint(sorted(tests))\n", "hint_html": "<p><code>df.groupby(\"cell\")<\/code> yields <code>(name, group)<\/code> pairs. For each group call <code>g[\"minute\"].tolist()<\/code> and <code>g[\"voltage_v\"].tolist()<\/code>. Convert the current with <code>float(g[\"current_a\"].iloc[0])<\/code>.<\/p>", "stdin": null, "tests": {"setup": "\nimport io\nimport math\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\ndef raises(exc, fn, *args):\n    try:\n        fn(*args)\n    except exc:\n        return True\n    except Exception:\n        return False\n    return False\n", "items": [["two cells", "sorted(tests) == ['X1', 'Y2']", "Return a dictionary keyed by cell name."], ["values are DischargeTest objects", "all(isinstance(t, DischargeTest) for t in tests.values())", "Build one DischargeTest per cell."], ["X1 capacity", "approx(tests['X1'].capacity_ah(3.4), 1.15)", "Pass the minute and voltage columns as lists."], ["Y2 capacity", "approx(tests['Y2'].capacity_ah(3.4), 0.940476, rel=1e-5)", "Each cell uses only its own rows."], ["works on new data", "approx(load_tests('cell,minute,voltage_v,current_a\\nZ9,0,4.0,2.0\\nZ9,60,3.0,2.0\\n')['Z9'].capacity_ah(3.5), 1.0)", "load_tests must use its argument, not the global CSV."]]}}, {"id": "t4", "title": "Rank and plot", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>With <code>tests<\/code> loaded (code supplied), create <code>caps<\/code>, a dictionary of capacity in Ah for each cell at a 3.4 V cutoff, and <code>best<\/code>, the name of the cell with the largest capacity. Plot both discharge curves on <code>ax<\/code> (each labeled with the cell name), draw a dashed horizontal line at 3.4 V, add a legend, and label the axes with units.<\/p>", "starter": "import io\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nCSV = \"\"\"cell,minute,voltage_v,current_a\nX1,0,4.10,1.0\nX1,15,3.95,1.0\nX1,30,3.82,1.0\nX1,45,3.70,1.0\nX1,60,3.55,1.0\nX1,75,3.30,1.0\nY2,0,4.05,1.0\nY2,15,3.88,1.0\nY2,30,3.72,1.0\nY2,45,3.56,1.0\nY2,60,3.35,1.0\nY2,75,3.05,1.0\n\"\"\"\n\nclass DischargeTest:\n    \"\"\"One constant-current discharge test of a battery cell.\"\"\"\n\n    def __init__(self, cell, minutes, volts, current_a):\n        self.cell = cell\n        self.minutes = list(minutes)\n        self.volts = list(volts)\n        self.current_a = current_a\n\n    def time_to_cutoff(self, cutoff):\n        if self.volts[0] <= cutoff:\n            return self.minutes[0]\n        if self.volts[-1] > cutoff:\n            return None\n        return float(np.interp(cutoff, self.volts[::-1], self.minutes[::-1]))\n\n    def capacity_ah(self, cutoff):\n        t = self.time_to_cutoff(cutoff)\n        if t is None:\n            return None\n        return self.current_a * t / 60\n\ndef load_tests(csv_text):\n    df = pd.read_csv(io.StringIO(csv_text))\n    found = {}\n    for name, g in df.groupby(\"cell\"):\n        found[name] = DischargeTest(name, g[\"minute\"].tolist(), g[\"voltage_v\"].tolist(), float(g[\"current_a\"].iloc[0]))\n    return found\n\ntests = load_tests(CSV)\n\ncaps = ...\nbest = ...\n\nfig, ax = plt.subplots()\n# plot each cell, add the cutoff line, the legend, and the axis labels\n\nprint(caps, best)\n", "hint_html": "<p><code>caps = {name: t.capacity_ah(3.4) for name, t in tests.items()}<\/code>. <code>best = max(caps, key=caps.get)<\/code>. In a loop: <code>ax.plot(t.minutes, t.volts, label=name)<\/code>. <code>ax.axhline(3.4, linestyle=\"--\", color=\"gray\")<\/code> draws the cutoff.<\/p>", "stdin": null, "tests": {"setup": "\nimport io\nimport math\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\ndef raises(exc, fn, *args):\n    try:\n        fn(*args)\n    except exc:\n        return True\n    except Exception:\n        return False\n    return False\n", "items": [["capacities", "approx(caps['X1'], 1.15) and approx(caps['Y2'], 0.940476, rel=1e-5)", "Call capacity_ah(3.4) for each cell."], ["best cell", "best == 'X1'", "Use max(caps, key=caps.get)."], ["two data curves and a cutoff line", "len(ax.lines) == 3 and sum(1 for l in ax.lines if len(l.get_xdata()) == 6) == 2", "Plot one curve per cell, then axhline."], ["legend with cell names", "ax.get_legend() is not None and sorted(t.get_text() for t in ax.get_legend().get_texts() if t.get_text() in ('X1', 'Y2')) == ['X1', 'Y2']", "Pass label=name to each plot call and call ax.legend()."], ["axes are labeled", "ax.get_xlabel() != '' and ax.get_ylabel() != ''", "Use set_xlabel and set_ylabel with units."]]}}, {"id": "t5", "title": "Pack capacity by Monte Carlo", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>A pack puts 4 cells in series, so its capacity is the capacity of the weakest cell. Each cell capacity is random with mean 1.05 Ah and standard deviation 0.06 Ah. With <code>rng = np.random.default_rng(11)<\/code> and <code>N = 50000<\/code>, draw <code>caps = rng.normal(1.05, 0.06, (N, 4))<\/code>. Store <code>pack<\/code> (the weakest cell in each trial), <code>pack_mean<\/code>, <code>p_pack_ok<\/code> (the fraction of packs with capacity at least 0.95 Ah) and <code>p_cell_ok<\/code> (the same fraction for the first cell alone).<\/p>", "starter": "import numpy as np\n\nN = 50000\nrng = np.random.default_rng(11)\n\ncaps = ...\npack = ...\npack_mean = ...\np_pack_ok = ...\np_cell_ok = ...\n\nprint(pack_mean, p_pack_ok, p_cell_ok)\n", "hint_html": "<p><code>caps.min(axis=1)<\/code> gives the weakest cell in each row. The mean of a Boolean array such as <code>pack &gt;= 0.95<\/code> is the fraction of True values.<\/p>", "stdin": null, "tests": {"setup": "\nimport io\nimport math\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\ndef raises(exc, fn, *args):\n    try:\n        fn(*args)\n    except exc:\n        return True\n    except Exception:\n        return False\n    return False\n", "items": [["array shape", "caps.shape == (50000, 4)", "Use rng.normal(1.05, 0.06, (N, 4))."], ["pack has one value per trial", "pack.shape == (50000,)", "Use caps.min(axis=1)."], ["pack mean is below the cell mean", "0.97 < pack_mean < 1.0", "The weakest of 4 cells averages below 1.05 Ah."], ["single cell passes about 95 percent", "0.94 < p_cell_ok < 0.96", "p_cell_ok = (caps[:, 0] >= 0.95).mean()"], ["pack passes about 82 percent", "0.80 < p_pack_ok < 0.84", "All four cells must pass, so use the pack minimum."]]}}, {"id": "t6", "title": "A test suite that catches bugs", "points": 20, "minutes": 25, "bonus": false, "prompt_html": "<p>Write <code>run_checks(fn)<\/code>. It receives a candidate function <code>fn(minutes, volts, cutoff)<\/code> that should return the time to the cutoff (or <code>None<\/code>). It runs your test cases and returns a list of failure messages, an empty list when <code>fn<\/code> passes everything. A crash inside <code>fn<\/code> must count as a failure and must not stop <code>run_checks<\/code>. The checks run your suite on one correct function and four buggy functions. The correct one must return <code>[]<\/code> and every buggy one must return at least one failure.<\/p>\n<p>Think about the cases: interpolation between samples, a cutoff that is never reached, a series that starts below the cutoff, and a cutoff that falls exactly on a sample.<\/p>", "starter": "def run_checks(fn):\n    failures = []\n    # add test cases here; append a message to failures when a case fails\n    return failures\n", "hint_html": "<p>Use a list of <code>(label, args, expected)<\/code>. For each, <code>try<\/code> to call <code>fn(*args)<\/code>, catch <code>Exception<\/code> and add a failure, otherwise compare with <code>expected<\/code>. Cases: <code>([0, 10], [4.0, 3.0], 3.5)<\/code> gives 5.0. <code>([0, 10], [4.0, 3.8], 3.5)<\/code> gives <code>None<\/code>. <code>([0, 10], [3.0, 2.5], 3.5)<\/code> gives 0. A cutoff exactly on a sample: <code>([0, 10, 20], [4.0, 3.5, 3.0], 3.5)<\/code> gives 10.0.<\/p>", "stdin": null, "tests": {"setup": "\ndef raises(exc, fn, *args):\n    try:\n        fn(*args)\n    except exc:\n        return True\n    except Exception:\n        return False\n    return False\n\ndef good_ttc(minutes, volts, cutoff):\n    if volts[0] <= cutoff:\n        return minutes[0]\n    if volts[-1] > cutoff:\n        return None\n    for i in range(1, len(volts)):\n        if volts[i] <= cutoff:\n            v0, v1 = volts[i - 1], volts[i]\n            t0, t1 = minutes[i - 1], minutes[i]\n            return t0 + (v0 - cutoff) / (v0 - v1) * (t1 - t0)\n\ndef bug_a(minutes, volts, cutoff):\n    for i in range(len(volts)):\n        if volts[i] <= cutoff:\n            return minutes[i]\n    return None\n\ndef bug_b(minutes, volts, cutoff):\n    if volts[0] <= cutoff:\n        return minutes[0]\n    if volts[-1] > cutoff:\n        return minutes[-1]\n    return good_ttc(minutes, volts, cutoff)\n\ndef bug_c(minutes, volts, cutoff):\n    if volts[-1] > cutoff:\n        return None\n    for i in range(len(volts)):\n        if volts[i] <= cutoff:\n            v0, v1 = volts[i - 1], volts[i]\n            t0, t1 = minutes[i - 1], minutes[i]\n            return t0 + (v0 - cutoff) / (v0 - v1) * (t1 - t0)\n\ndef bug_d(minutes, volts, cutoff):\n    if volts[0] <= cutoff:\n        return minutes[0]\n    i = 1\n    while volts[i] > cutoff:\n        i += 1\n    v0, v1 = volts[i - 1], volts[i]\n    t0, t1 = minutes[i - 1], minutes[i]\n    return t0 + (v0 - cutoff) / (v0 - v1) * (t1 - t0)\n", "items": [["returns a list", "isinstance(run_checks(good_ttc), list)", "Return the list of failures."], ["passes the correct function", "run_checks(good_ttc) == []", "Your own tests must not fail correct code."], ["catches the missing interpolation", "len(run_checks(bug_a)) > 0", "Add a case where the cutoff falls between two samples."], ["catches the wrong value when the cutoff is never reached", "len(run_checks(bug_b)) > 0", "Add a case where the series stays above the cutoff."], ["catches the series that starts below the cutoff", "len(run_checks(bug_c)) > 0", "Add a case where the first voltage is already below the cutoff."], ["catches a crash without crashing", "len(run_checks(bug_d)) > 0", "Wrap each call in try and except Exception."]]}}, {"id": "b1", "title": "Docstring checker", "points": 10, "minutes": 20, "bonus": true, "prompt_html": "<p>Write <code>has_docstrings(src)<\/code> that parses the source text with <code>ast<\/code> and returns True when every function definition in it has a docstring (and True if there are no functions).<\/p>", "starter": "import ast\n\ndef has_docstrings(src):\n    ...\n\nprint(has_docstrings(\"def f():\\n    return 1\\n\"))\n", "hint_html": "<p>Walk the tree with <code>ast.walk<\/code>. For each <code>ast.FunctionDef<\/code> node check <code>ast.get_docstring(node)<\/code>.<\/p>", "stdin": null, "tests": {"setup": "\nimport io\nimport math\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\ndef raises(exc, fn, *args):\n    try:\n        fn(*args)\n    except exc:\n        return True\n    except Exception:\n        return False\n    return False\n", "items": [["function with a docstring", "has_docstrings('def f():\\n    \"\"\"x\"\"\"\\n    return 1\\n') is True", "Return True when every function has a docstring."], ["function without a docstring", "has_docstrings('def f():\\n    return 1\\n') is False", "Return False when a function lacks one."], ["no functions", "has_docstrings('x = 1\\n') is True", "all() of an empty list is True."], ["one of two missing", "has_docstrings('def f():\\n    \"\"\"x\"\"\"\\ndef g():\\n    pass\\n') is False", "Check every function."]]}}]}, "lab_minutes": 150, "quiz": [{"q": "What does <code>2 + 3 * 4 ** 2<\/code> evaluate to?", "options": ["80", "26", "400", "50"], "answer": 3, "why": "Powers come first (16), then multiplication (48), then addition (50)."}, {"q": "What does <code>f\"{3.14159:.2f}\"<\/code> produce?", "options": ["<code>3.14<\/code>", "<code>3.1<\/code>", "<code>3.142<\/code>", "<code>3<\/code>"], "answer": 0, "why": "<code>.2f<\/code> formats a float with two digits after the decimal point."}, {"q": "What does <code>list(range(2, 10, 3))<\/code> give?", "options": ["<code>[3, 6, 9]<\/code>", "<code>[2, 5, 8]<\/code>", "<code>[2, 5, 8, 10]<\/code>", "<code>[2, 4, 6, 8]<\/code>"], "answer": 1, "why": "The step is 3, so 2, 5, 8 and then 11, which is past the stop."}, {"q": "A dictionary <code>d<\/code> has no key <code>\"z\"<\/code>. What does <code>d.get(\"z\", 0)<\/code> return?", "options": ["<code>\"z\"<\/code>", "An error", "0", "<code>None<\/code>"], "answer": 2, "why": "<code>get<\/code> returns the default when the key is missing."}, {"q": "What is the purpose of <code>try<\/code> and <code>except FileNotFoundError<\/code>?", "options": ["To check for spelling mistakes", "To create the file", "To speed up the program", "To handle a missing file without crashing the program"], "answer": 3, "why": "The program continues in the <code>except<\/code> branch when the file is not found."}, {"q": "A function ends with <code>print(total)<\/code> and no <code>return<\/code>. What does <code>x = f()<\/code> store in <code>x<\/code>?", "options": ["<code>None<\/code>", "An error", "The total", "An empty string"], "answer": 0, "why": "A function without <code>return<\/code> gives back <code>None<\/code>."}, {"q": "What does <code>a[a &gt; 2]<\/code> return for <code>a = np.array([1, 5, 2, 8])<\/code>?", "options": ["An array holding 1 and 2", "An array holding 5 and 8", "The number 2", "An array holding True and False values"], "answer": 1, "why": "A boolean mask keeps the items where the comparison is True."}, {"q": "An array has shape (3, 4). What is the shape of <code>a.mean(axis=0)<\/code>?", "options": ["<code>(3, 4)<\/code>", "<code>()<\/code>", "<code>(4,)<\/code>", "<code>(3,)<\/code>"], "answer": 2, "why": "<code>axis=0<\/code> averages down the rows and leaves one value per column."}, {"q": "You plot two curves and want a legend. What must you do?", "options": ["Call <code>ax.names()<\/code>", "Call <code>ax.legend()<\/code> only", "Pass <code>title=...<\/code> to each plot call", "Pass <code>label=...<\/code> to each plot call and call <code>ax.legend()<\/code>"], "answer": 3, "why": "The legend reads each line's label, and <code>legend()<\/code> draws it."}, {"q": "What does <code>df.groupby(\"sensor\")[\"temp_c\"].mean()<\/code> return?", "options": ["One average per sensor", "The average of the whole table", "A new column in <code>df<\/code>", "The first temperature of each sensor"], "answer": 0, "why": "The rows are split by sensor and each group is averaged."}, {"q": "What is the difference between <code>loc<\/code> and <code>iloc<\/code> in pandas?", "options": ["<code>loc<\/code> is faster", "<code>loc<\/code> selects by label and <code>iloc<\/code> selects by position", "They are the same", "<code>loc<\/code> selects columns and <code>iloc<\/code> selects rows"], "answer": 1, "why": "<code>loc<\/code> uses labels. <code>iloc<\/code> uses integer positions."}, {"q": "Bisection starts with an interval of width 8. After 3 steps, how wide is the interval?", "options": ["2", "4", "1", "0"], "answer": 2, "why": "Each step halves the width: 8, 4, 2, 1."}, {"q": "Which function solves the linear system <code>A x = b<\/code>?", "options": ["<code>np.solve(A, b)<\/code>", "<code>np.inv(A) + b<\/code>", "<code>A.solve(b)<\/code>", "<code>np.linalg.solve(A, b)<\/code>"], "answer": 3, "why": "<code>np.linalg.solve<\/code> returns the vector <code>x<\/code>."}, {"q": "A Monte Carlo estimate has an error of 0.02 with 10,000 samples. About what error do you expect with 1,000,000 samples?", "options": ["0.002", "0.01", "0.02", "0.0002"], "answer": 0, "why": "Error scales as one over the square root of the sample count. A hundred times more samples cuts it by 10."}, {"q": "What does Euler's method compute for the next value?", "options": ["New value = average of all previous values", "New value = old value + rate times step size", "New value = old value times step size", "New value = rate divided by step size"], "answer": 1, "why": "It follows the current slope for one short step."}, {"q": "In a class method, what is <code>self<\/code>?", "options": ["A global variable", "The name of the class", "The object the method was called on", "The return value"], "answer": 2, "why": "<code>obj.method()<\/code> runs the method with <code>self<\/code> set to <code>obj<\/code>."}, {"q": "What does <code>super().__init__(name)<\/code> do in a subclass?", "options": ["Deletes the parent attributes", "Creates a second object", "Prints the name", "Runs the parent class setup code"], "answer": 3, "why": "<code>super()<\/code> gives access to the parent class."}, {"q": "A thermostat turns on below 20 degrees and off above 22. The temperature is 21 and the heater is on. What happens?", "options": ["The heater stays on", "The heater turns on again", "The program stops", "The heater turns off"], "answer": 0, "why": "Inside the band the controller keeps its state. This prevents rapid switching."}, {"q": "What makes a test suite good?", "options": ["It has many print statements", "It passes correct code and fails code with bugs", "It runs only one case", "It never fails"], "answer": 1, "why": "A suite that cannot fail catches nothing. Buggy versions show whether the tests work."}, {"q": "Which requirement is testable?", "options": ["The program should be accurate", "The program shall be user friendly", "For 1.0 A and 69 minutes the program shall report 1.15 Ah", "The program should handle data well"], "answer": 2, "why": "It states an input and an exact expected output."}], "quiz_minutes": 45, "quiz_intro_html": "<p>This final quiz has 20 questions. It covers weeks 9 to 14 and key ideas from weeks 1 to 8. You see the explanation right after each answer. Allow about 45 minutes. You can reset the quiz and try again, so use it for review before your capstone submission.<\/p>"}</script>
+<script id="harness" type="text/x-python">import sys, io, os, json, ast, base64, builtins, traceback, contextlib, math, random
+
+os.environ.setdefault("MPLBACKEND", "Agg")
+import importlib
+if "" not in sys.path:
+    sys.path.insert(0, "")
+
+_OUT_CAP = 20000
+_LECTURE_NS = {"__name__": "__main__"}
+
+
+class _Capped(io.StringIO):
+    def write(self, s):
+        if self.tell() > _OUT_CAP:
+            raise RuntimeError("Output limit reached. Your code printed too much text.")
+        return super().write(s)
+
+
+def approx(a, b, rel=1e-6, abs_=1e-9):
+    try:
+        if "numpy" in sys.modules:
+            import numpy as _np
+            if isinstance(a, _np.ndarray) or isinstance(b, _np.ndarray):
+                return bool(_np.allclose(a, b, rtol=rel, atol=abs_))
+        if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+            return len(a) == len(b) and all(approx(x, y, rel, abs_) for x, y in zip(a, b))
+        return abs(float(a) - float(b)) <= max(abs_, rel * abs(float(b)))
+    except Exception:
+        return False
+
+
+def uses_node(src, *names):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return False
+    wanted = tuple(getattr(ast, n) for n in names)
+    return any(isinstance(n, wanted) for n in ast.walk(tree))
+
+
+def calls_name(src, name):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return False
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Call):
+            f = n.func
+            if isinstance(f, ast.Name) and f.id == name:
+                return True
+            if isinstance(f, ast.Attribute) and f.attr == name:
+                return True
+    return False
+
+
+def line_has(src, target, *words):
+    """True when an assignment to `target` has every word on its right side."""
+    for line in src.splitlines():
+        s = line.strip()
+        if s.startswith("#") or "=" not in s:
+            continue
+        left, _, right = s.partition("=")
+        if left.strip() == target and all(w in right for w in words):
+            return True
+    return False
+
+
+def run_with(src, inputs=(), ns=None):
+    """Run student source with scripted input() values; return what it printed."""
+    queue = list(inputs)
+    old = builtins.input
+
+    def _fake(prompt=""):
+        print(prompt, end="")
+        if not queue:
+            raise EOFError("input() called more times than expected")
+        v = queue.pop(0)
+        print(v)
+        return v
+
+    buf = io.StringIO()
+    builtins.input = _fake
+    try:
+        with contextlib.redirect_stdout(buf):
+            exec(compile(src, "<your code>", "exec"), ns if ns is not None else {"__name__": "__main__"})
+    finally:
+        builtins.input = old
+    return buf.getvalue()
+
+
+def rerun(src, **over):
+    """Execute student source again with top-level assignments replaced by the given constants.
+    Returns the resulting namespace. Output is discarded."""
+    tree = ast.parse(src)
+    for node in tree.body:
+        if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name) and node.targets[0].id in over):
+            node.value = ast.Constant(over[node.targets[0].id])
+    ast.fix_missing_locations(tree)
+    ns = {"__name__": "__main__"}
+    with contextlib.redirect_stdout(io.StringIO()):
+        exec(compile(tree, "<your code>", "exec"), ns)
+    return ns
+
+
+def count_defs(src):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return 0
+    return sum(isinstance(n, ast.FunctionDef) for n in ast.walk(tree))
+
+
+def count_classes(src):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return 0
+    return sum(isinstance(n, ast.ClassDef) for n in ast.walk(tree))
+
+
+def _format_error(exc, code):
+    lines = code.split("\n")
+    if isinstance(exc, SyntaxError):
+        ln = exc.lineno
+        msg = "SyntaxError: " + str(exc.msg)
+        if ln and 1 <= ln <= len(lines):
+            msg += "\n  on line %d: %s" % (ln, lines[ln - 1].strip())
+        return msg
+    tb = traceback.TracebackException.from_exception(exc)
+    ln = None
+    for fs in tb.stack:
+        if fs.filename == "<your code>":
+            ln = fs.lineno
+    msg = "".join(tb.format_exception_only()).strip()
+    if ln and 1 <= ln <= len(lines):
+        msg += "\n  on line %d: %s" % (ln, lines[ln - 1].strip())
+    return msg
+
+
+def _make_input(stdin_lines, out):
+    queue = list(stdin_lines)
+
+    def _input(prompt=""):
+        out.write(str(prompt))
+        if not queue:
+            raise EOFError("input() ran out of lines. Type one value per line in the Input box under the code.")
+        val = queue.pop(0)
+        out.write(val + "\n")
+        return val
+
+    return _input
+
+
+def _exec_code(code, ns, out):
+    tree = ast.parse(code, "<your code>", "exec")
+    last = None
+    if tree.body and isinstance(tree.body[-1], ast.Expr):
+        last = ast.Expression(tree.body.pop().value)
+    exec(compile(tree, "<your code>", "exec"), ns)
+    if last is not None:
+        val = eval(compile(last, "<your code>", "eval"), ns)
+        if val is not None:
+            out.write(repr(val) + "\n")
+
+
+def _collect_images():
+    imgs = []
+    if "matplotlib.pyplot" in sys.modules:
+        import matplotlib.pyplot as plt
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", dpi=100, bbox_inches="tight")
+            imgs.append(base64.b64encode(buf.getvalue()).decode("ascii"))
+        plt.close("all")
+    return imgs
+
+
+def reset_lecture():
+    _LECTURE_NS.clear()
+    _LECTURE_NS["__name__"] = "__main__"
+
+
+def run_cell(req_json):
+    req = json.loads(req_json)
+    code = req.get("code", "")
+    mode = req.get("mode", "fresh")
+    stdin_lines = req.get("stdin") or []
+    tests = req.get("tests")
+    ns = _LECTURE_NS if mode == "lecture" else {"__name__": "__main__"}
+    importlib.invalidate_caches()
+    out = _Capped()
+    err = None
+    real_input = builtins.input
+    builtins.input = _make_input(stdin_lines, out)
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
+            try:
+                random.seed()
+                _exec_code(code, ns, out)
+            except BaseException as exc:
+                if isinstance(exc, KeyboardInterrupt):
+                    raise
+                err = _format_error(exc, code)
+    finally:
+        builtins.input = real_input
+    result = {"stdout": out.getvalue(), "error": err, "images": [], "tests": None}
+    try:
+        result["images"] = _collect_images()
+    except Exception as exc:
+        result["stdout"] += "\n(Plot could not be drawn: %s)" % exc
+    if tests is not None:
+        result["tests"] = _run_tests(tests, ns, code, err, out.getvalue())
+    return json.dumps(result)
+
+
+def _run_tests(tests, ns, code, err, stdout_text):
+    items = tests.get("items", [])
+    results = []
+    if err is not None:
+        for label, _expr, hint in items:
+            results.append({"label": label, "ok": False, "msg": "Fix the error above first."})
+        return results
+    env = ns
+    helpers = {
+        "approx": approx, "out": stdout_text, "src": code, "ast": ast,
+        "uses_node": uses_node, "calls_name": calls_name,
+        "count_defs": count_defs, "run_with": run_with, "rerun": rerun, "count_classes": count_classes, "line_has": line_has,
+        "math": math, "random": random, "io": io, "_in_tests": True,
+    }
+    _missing = object()
+    saved = {k: env.get(k, _missing) for k in helpers}
+    env.update(helpers)
+    sink = _Capped()
+    try:
+        setup = tests.get("setup")
+        if setup:
+            try:
+                with contextlib.redirect_stdout(sink):
+                    exec(compile(setup, "<tests>", "exec"), env)
+            except BaseException as exc:
+                reason = "Could not run the checks: %s: %s" % (type(exc).__name__, exc)
+                return [{"label": l, "ok": False, "msg": reason} for l, _e, _h in items]
+        for label, expr, hint in items:
+            try:
+                with contextlib.redirect_stdout(sink):
+                    ok = bool(eval(compile(expr, "<tests>", "eval"), env))
+                results.append({"label": label, "ok": ok, "msg": "" if ok else hint})
+            except BaseException as exc:
+                if isinstance(exc, KeyboardInterrupt):
+                    raise
+                results.append({"label": label, "ok": False,
+                                "msg": "%s (%s: %s)" % (hint, type(exc).__name__, exc)})
+    finally:
+        for k, v in saved.items():
+            if v is _missing:
+                env.pop(k, None)
+            else:
+                env[k] = v
+    return results
+</script>
+<script id="worker-src" type="text/plain">
+let py = null;
+self.onmessage = async function (e) {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.base + 'pyodide.js');
+      py = await loadPyodide({ indexURL: m.base });
+      py.runPython(m.harness);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'initerror', message: String(err) });
+    }
+    return;
+  }
+  if (m.type === 'reset') {
+    try { py.runPython('reset_lecture()'); } catch (err) {}
+    postMessage({ type: 'resetdone' });
+    return;
+  }
+  if (m.type === 'run') {
+    try {
+      postMessage({ type: 'status', text: 'Loading packages if needed...' });
+      const quiet = { messageCallback: function () {}, errorCallback: function () {} };
+      await py.loadPackagesFromImports(m.code, quiet);
+      if (m.tests && m.tests.setup) { await py.loadPackagesFromImports(m.tests.setup, quiet); }
+      postMessage({ type: 'started' });
+      py.globals.set('_req_json', JSON.stringify({ code: m.code, stdin: m.stdin, mode: m.mode, tests: m.tests }));
+      const res = py.runPython('run_cell(_req_json)');
+      postMessage({ type: 'result', result: JSON.parse(res) });
+    } catch (err) {
+      postMessage({ type: 'error', message: String(err) });
+    }
+  }
+};
+</script>
+<script>
+(function () {
+'use strict';
+var D = JSON.parse(document.getElementById('data').textContent);
+var HARNESS = document.getElementById('harness').textContent;
+var WORKER_SRC = document.getElementById('worker-src').textContent;
+var KEY = 'pyeng-' + D.course_id + '-w' + D.num;
+
+/* ---------- storage ---------- */
+var mem = null;
+function loadState() {
+  try { var s = localStorage.getItem(KEY); if (s) { return JSON.parse(s); } } catch (e) {}
+  return mem || {};
+}
+var S = loadState();
+S.name = S.name || ''; S.lecDone = S.lecDone || {}; S.checks = S.checks || {};
+S.code = S.code || {}; S.lab = S.lab || {}; S.quiz = S.quiz || {};
+function save() { mem = S; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- dom helpers ---------- */
+function h(tag, attrs, kids) {
+  var n = document.createElement(tag);
+  if (attrs) { for (var k in attrs) {
+    if (k === 'class') { n.className = attrs[k]; }
+    else if (k === 'html') { n.innerHTML = attrs[k]; }
+    else if (k === 'text') { n.textContent = attrs[k]; }
+    else if (k.slice(0, 2) === 'on') { n.addEventListener(k.slice(2), attrs[k]); }
+    else { n.setAttribute(k, attrs[k]); }
+  } }
+  if (kids) { kids.forEach(function (c) { if (c) { n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); } }); }
+  return n;
+}
+
+/* ---------- python runner ---------- */
+var Py = (function () {
+  var worker = null, ready = false, current = null, queue = [], timer = null, nextId = 1;
+  var stopBtn = document.getElementById('stopbtn');
+  var statusEl = document.getElementById('pystatus');
+  function status(t) { statusEl.textContent = t; }
+  function start() {
+    var blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    worker = new Worker(URL.createObjectURL(blob));
+    ready = false;
+    worker.onmessage = onMsg;
+    worker.onerror = function (e) { finish(failure('The Python worker crashed: ' + (e.message || 'unknown error'))); };
+    worker.postMessage({ type: 'init', harness: HARNESS, base: D.pyodide_base });
+    status('Starting Python (the first start takes 10 to 30 seconds)...');
+  }
+  function kill() {
+    if (worker) { worker.terminate(); worker = null; }
+    ready = false; clearTimer();
+  }
+  function failure(msg, req) {
+    var r = { stdout: '', error: msg, images: [], tests: null };
+    if (req && req.tests) {
+      r.tests = req.tests.items.map(function (it) { return { label: it[0], ok: false, msg: 'No result.' }; });
+    }
+    return r;
+  }
+  function clearTimer() { if (timer) { clearTimeout(timer); timer = null; } stopBtn.hidden = true; }
+  function armTimer() {
+    clearTimer(); stopBtn.hidden = false;
+    var secs = (current && current.req.timeout) || 20;
+    timer = setTimeout(function () {
+      kill();
+      finish(failure('Stopped after ' + secs + ' seconds. Look for a loop that never ends. Python restarted, so run earlier cells again.', current && current.req));
+      start();
+    }, secs * 1000);
+  }
+  function finish(result) {
+    var c = current; current = null; clearTimer();
+    if (c) { c.resolve(result); }
+    status(ready ? 'Python ready' : 'Python restarting...');
+    pump();
+  }
+  function onMsg(e) {
+    var m = e.data;
+    if (m.type === 'ready') { ready = true; status('Python ready'); pump(); }
+    else if (m.type === 'initerror') {
+      kill();
+      status('Python could not start');
+      var q = queue.slice(); queue = [];
+      if (current) { q.unshift(current); current = null; }
+      q.forEach(function (c) { c.resolve(failure('Python could not start. It needs an internet connection to load. Reload the page and try again. Details: ' + m.message, c.req)); });
+    }
+    else if (m.type === 'status') { status(m.text); }
+    else if (m.type === 'started') { status('Running...'); armTimer(); }
+    else if (m.type === 'result') { finish(m.result); }
+    else if (m.type === 'error') { finish(failure('Python error: ' + m.message, current && current.req)); }
+    else if (m.type === 'resetdone') { status('Python session reset'); }
+  }
+  function pump() {
+    if (!ready || current || !queue.length) { return; }
+    current = queue.shift();
+    status('Preparing...');
+    stopBtn.hidden = false;
+    worker.postMessage({ type: 'run', code: current.req.code, stdin: current.req.stdin || [], mode: current.req.mode, tests: current.req.tests || null });
+  }
+  stopBtn.addEventListener('click', function () {
+    if (!current) { return; }
+    kill();
+    finish(failure('Stopped. Python restarted, so run earlier cells again.', current.req));
+    start();
+  });
+  return {
+    run: function (req) {
+      return new Promise(function (resolve) {
+        queue.push({ id: nextId++, req: req, resolve: resolve });
+        if (!worker) { start(); } else { pump(); }
+      });
+    },
+    reset: function () { if (worker && ready) { worker.postMessage({ type: 'reset' }); } }
+  };
+})();
+
+/* ---------- result rendering ---------- */
+function renderResult(box, r, opts) {
+  box.innerHTML = '';
+  if (r.stdout) { box.appendChild(h('pre', { class: 'stdout', text: r.stdout.replace(/\n$/, '') })); }
+  if (r.error) { box.appendChild(h('div', { class: 'err', role: 'alert' }, [h('strong', { text: 'Error' }), h('pre', { text: r.error })])); }
+  (r.images || []).forEach(function (b64) { box.appendChild(h('img', { src: 'data:image/png;base64,' + b64, alt: 'Plot produced by your code' })); });
+  if (!r.stdout && !r.error && !(r.images && r.images.length) && !(opts && opts.quietEmpty)) {
+    box.appendChild(h('p', { class: 'small', text: 'Ran with no output. Use print() to see values.' }));
+  }
+  if (r.tests) {
+    var ul = h('ul', { class: 'tests' });
+    r.tests.forEach(function (t) {
+      ul.appendChild(h('li', null, [
+        h('span', { class: 'badge ' + (t.ok ? 'pass' : 'fail'), text: t.ok ? 'PASS' : 'FAIL' }),
+        h('span', { text: t.label + (t.ok || !t.msg ? '' : ' Hint: ' + t.msg) })
+      ]));
+    });
+    box.appendChild(ul);
+  }
+}
+
+/* ---------- code cell ---------- */
+function codeCell(o) {
+  var wrap = h('div', { class: 'cell' });
+  var ta = h('textarea', { class: 'code', spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', 'aria-label': o.label || 'Python code editor' });
+  ta.value = (S.code[o.key] !== undefined) ? S.code[o.key] : o.code;
+  function fit() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 4, 640) + 'px'; }
+  var stdinWrap = h('div', { class: 'stdin' });
+  var stdinBox = h('textarea', { class: 'stdin-box', spellcheck: 'false', 'aria-label': 'Input lines for input() calls' });
+  var stdinKey = o.key + ':stdin';
+  stdinBox.value = (S.code[stdinKey] !== undefined) ? S.code[stdinKey] : (o.stdin || []).join('\n');
+  stdinWrap.appendChild(h('label', { text: 'Input box: type one line per input() call, in order.' }));
+  stdinWrap.appendChild(stdinBox);
+  function syncStdin() { stdinWrap.hidden = ta.value.indexOf('input(') === -1; }
+  var out = h('div', { class: 'out', 'aria-live': 'polite' });
+  var runBtn = h('button', { class: 'btn primary', text: o.tests ? 'Run' : 'Run cell' });
+  var checkBtn = o.tests ? h('button', { class: 'btn', text: 'Check my work' }) : null;
+  var resetBtn = h('button', { class: 'btn', text: 'Reset code' });
+  var hintBtn = (o.hint) ? h('button', { class: 'btn', text: 'Show hint' }) : null;
+  var stale = h('span', { class: 'badge warn', text: 'Edited since last check', hidden: '' });
+  stale.hidden = true;
+  function go(withTests) {
+    var req = { code: ta.value, stdin: stdinBox.value ? stdinBox.value.split('\n') : [], mode: o.mode, timeout: o.timeout || 20 };
+    if (withTests) { req.tests = o.tests; }
+    runBtn.disabled = true; if (checkBtn) { checkBtn.disabled = true; }
+    out.innerHTML = ''; out.appendChild(h('p', { class: 'small', text: 'Working...' }));
+    Py.run(req).then(function (r) {
+      runBtn.disabled = false; if (checkBtn) { checkBtn.disabled = false; }
+      renderResult(out, r);
+      if (withTests && o.onCheck) { o.onCheck(r); stale.hidden = true; }
+    });
+  }
+  runBtn.addEventListener('click', function () { go(false); });
+  if (checkBtn) { checkBtn.addEventListener('click', function () { go(true); }); }
+  resetBtn.addEventListener('click', function () {
+    if (ta.value !== o.code && !confirm('Replace your code with the starting code?')) { return; }
+    ta.value = o.code; delete S.code[o.key]; save(); fit(); syncStdin();
+  });
+  var hintBox = null;
+  if (hintBtn) { hintBtn.addEventListener('click', function () {
+    if (hintBox) { hintBox.remove(); hintBox = null; hintBtn.textContent = 'Show hint'; return; }
+    hintBox = h('div', { class: 'hint', html: o.hint }); row.after(hintBox); hintBtn.textContent = 'Hide hint';
+  }); }
+  ta.addEventListener('input', function () {
+    S.code[o.key] = ta.value; save(); fit(); syncStdin(); if (o.tests && o.hasResult && o.hasResult()) { stale.hidden = false; }
+  });
+  stdinBox.addEventListener('input', function () { S.code[stdinKey] = stdinBox.value; save(); });
+  ta.addEventListener('keydown', function (e) {
+    if (e.key === 'Tab' && !e.shiftKey) {
+      e.preventDefault();
+      var s = ta.selectionStart, en = ta.selectionEnd;
+      ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(en);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+      ta.dispatchEvent(new Event('input'));
+    } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(false); }
+  });
+  var row = h('div', { class: 'row' }, [runBtn, checkBtn, hintBtn, resetBtn, stale]);
+  wrap.appendChild(ta); wrap.appendChild(stdinWrap); wrap.appendChild(row); wrap.appendChild(out);
+  setTimeout(function () { fit(); syncStdin(); }, 0);
+  wrap.refit = function () { fit(); };
+  return wrap;
+}
+
+/* ---------- multiple choice ---------- */
+function mcq(o) {
+  var box = h('div', { class: o.cls || 'checkq' });
+  box.appendChild(h('div', { class: 'q', html: o.q }));
+  var ul = h('ul', { class: 'opts' });
+  var btns = [];
+  var why = h('div', { class: 'why', hidden: '' }); why.hidden = true;
+  function lock(choice) {
+    btns.forEach(function (b, i) {
+      b.disabled = true;
+      if (i === o.answer) { b.classList.add('right'); }
+      else if (i === choice) { b.classList.add('wrong'); }
+    });
+    var ok = choice === o.answer;
+    why.hidden = false;
+    why.innerHTML = '';
+    why.appendChild(h('strong', { text: ok ? 'Correct. ' : 'Not quite. ' }));
+    why.appendChild(h('span', { html: o.why }));
+  }
+  o.options.forEach(function (t, i) {
+    var b = h('button', { type: 'button', html: t });
+    b.addEventListener('click', function () { if (o.saved === undefined || o.saved === null) { o.onAnswer(i); } lock(i); });
+    btns.push(b); ul.appendChild(h('li', null, [b]));
+  });
+  box.appendChild(ul); box.appendChild(why);
+  if (o.saved !== undefined && o.saved !== null) { lock(o.saved); }
+  return box;
+}
+
+/* ---------- overview ---------- */
+var tiles = {};
+function renderOverview() {
+  var p = document.getElementById('panel-overview');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'hook', html: '<strong>Why this week matters.</strong> ' + D.hook }));
+  p.appendChild(h('h2', { text: 'Progress' }));
+  var g = h('div', { class: 'grid' });
+  [['lecture', 'Lecture sections done'], ['lab', 'Lab score'], ['quiz', 'Quiz score']].forEach(function (x) {
+    var big = h('div', { class: 'big', text: '0' });
+    tiles[x[0]] = big;
+    g.appendChild(h('div', { class: 'tile' }, [big, h('div', { class: 'lbl', text: x[1] })]));
+  });
+  p.appendChild(g);
+  p.appendChild(h('h2', { text: 'Learning objectives' }));
+  p.appendChild(h('p', { text: 'After this week you can:' }));
+  var ul = h('ul'); D.objectives.forEach(function (t) { ul.appendChild(h('li', { html: t })); }); p.appendChild(ul);
+  p.appendChild(h('h2', { text: 'Time plan' }));
+  p.appendChild(h('p', { html: 'Lecture: about ' + D.lecture_minutes + ' minutes of reading and coding. Lab: about ' + D.lab_minutes + ' minutes. Quiz: about ' + D.quiz_minutes + ' minutes. Take a short break between sections.' }));
+  p.appendChild(h('h2', { text: 'This week’s lab' }));
+  p.appendChild(h('p', { html: D.lab.summary }));
+  p.appendChild(h('h2', { text: 'How this page works' }));
+  var how = h('ul');
+  [
+    'Python runs inside your browser. Nothing to install. The first run takes 10 to 30 seconds while Python loads; later runs are fast.',
+    'Every code cell is editable. Change values, break things, and run again. Press Ctrl+Enter (Command+Enter on Mac) in a cell to run it.',
+    'Cells in the Lecture tab share one Python session, so a variable made in one cell is available in the next. Use Reset Python session to start clean.',
+    'Your code and answers save in this browser on this device. Clearing site data erases them. Use the report in the Lab tab to submit your work.',
+    'If a cell runs more than 20 seconds, Python stops it. That usually means a loop that never ends.'
+  ].forEach(function (t) { how.appendChild(h('li', { text: t })); });
+  p.appendChild(how);
+}
+
+/* ---------- lecture ---------- */
+function updateLecture() {
+  var n = D.lecture.length, done = D.lecture.filter(function (_s, i) { return S.lecDone[i]; }).length;
+  var bar = document.getElementById('lecbar'); if (bar) { bar.firstChild.style.width = (100 * done / n) + '%'; }
+  var t = document.getElementById('lectext'); if (t) { t.textContent = done + ' of ' + n + ' sections complete'; }
+  tiles.lecture.textContent = done + '/' + n;
+}
+function renderLecture() {
+  var p = document.getElementById('panel-lecture');
+  p.innerHTML = '';
+  var top = h('div', { class: 'row' }, [
+    h('span', { id: 'lectext', class: 'small' }),
+    h('span', { class: 'grow', style: 'flex:1' }),
+    h('button', { class: 'btn', text: 'Reset Python session', onclick: function () { Py.reset(); } })
+  ]);
+  p.appendChild(top);
+  p.appendChild(h('div', { class: 'bar', id: 'lecbar' }, [h('span')]));
+  D.lecture.forEach(function (s, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: 'Section ' + (i + 1) + ' of ' + D.lecture.length + ', about ' + s.minutes + ' minutes' }));
+    card.appendChild(h('h3', { text: s.title }));
+    card.appendChild(h('div', { html: s.html }));
+    s.cells.forEach(function (c, j) {
+      if (c.note) { card.appendChild(h('p', { class: 'small', html: c.note })); }
+      card.appendChild(codeCell({ key: 'lec' + i + '_' + j, code: c.code, stdin: c.stdin, mode: 'lecture', label: 'Code for section ' + (i + 1) + ', cell ' + (j + 1) }));
+    });
+    if (s.check) {
+      var id = 'c' + i;
+      card.appendChild(mcq({ q: s.check.q, options: s.check.options, answer: s.check.answer, why: s.check.why, saved: S.checks[id], onAnswer: function (k) { S.checks[id] = k; save(); } }));
+    }
+    var cb = h('input', { type: 'checkbox', id: 'done' + i });
+    cb.checked = !!S.lecDone[i];
+    cb.addEventListener('change', function () { S.lecDone[i] = cb.checked; save(); updateLecture(); });
+    card.appendChild(h('div', { class: 'done-row' }, [cb, h('label', { for: 'done' + i, text: 'Mark this section complete' })]));
+    p.appendChild(card);
+  });
+  p.appendChild(h('h2', { text: 'Week summary' }));
+  p.appendChild(h('div', { class: 'card', html: D.summary }));
+  updateLecture();
+}
+
+/* ---------- lab ---------- */
+function labScore() {
+  var tot = 0, bonus = 0;
+  D.lab.tasks.forEach(function (t) {
+    var r = S.lab[t.id]; if (r && r.total) { var v = t.points * r.passed / r.total; if (t.bonus) { bonus += v; } else { tot += v; } }
+  });
+  return { score: Math.round(tot * 10) / 10, bonus: Math.round(bonus * 10) / 10 };
+}
+function updateLab() {
+  var s = labScore();
+  var max = D.lab.tasks.filter(function (t) { return !t.bonus; }).reduce(function (a, t) { return a + t.points; }, 0);
+  var el = document.getElementById('labscore'); if (el) { el.textContent = s.score + ' / ' + max + (s.bonus ? ' (+' + s.bonus + ' bonus)' : ''); }
+  tiles.lab.textContent = s.score + '/' + max;
+}
+function renderLab() {
+  var p = document.getElementById('panel-lab');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'card', html: D.lab.intro_html }));
+  var sc = h('div', { class: 'row' }, [h('strong', { text: 'Lab score: ' }), h('span', { id: 'labscore', class: 'badge info', text: '0' }), h('span', { class: 'small', text: 'Updates each time you press Check my work.' })]);
+  p.appendChild(sc);
+  D.lab.tasks.forEach(function (t, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: (t.bonus ? 'Bonus challenge' : 'Task ' + (i + 1)) + ', ' + t.points + (t.bonus ? ' bonus points' : ' points') + ', about ' + t.minutes + ' minutes' }));
+    card.appendChild(h('h3', { text: t.title }));
+    card.appendChild(h('div', { html: t.prompt_html }));
+    var res = S.lab[t.id];
+    var note = h('p', { class: 'small', text: res ? ('Last check: ' + res.passed + ' of ' + res.total + ' tests passed.') : 'Not checked yet.' });
+    var cell = codeCell({
+      key: 'lab_' + t.id, code: t.starter, stdin: t.stdin, mode: 'fresh', tests: t.tests, hint: t.hint_html, timeout: 20, label: 'Code for ' + t.title,
+      hasResult: function () { return !!S.lab[t.id]; },
+      onCheck: function (r) {
+        var passed = r.tests ? r.tests.filter(function (x) { return x.ok; }).length : 0;
+        S.lab[t.id] = { passed: passed, total: r.tests ? r.tests.length : 0, at: new Date().toISOString() };
+        save(); note.textContent = 'Last check: ' + passed + ' of ' + S.lab[t.id].total + ' tests passed.'; updateLab();
+      }
+    });
+    card.appendChild(cell); card.appendChild(note);
+    p.appendChild(card);
+  });
+  p.appendChild(h('h2', { text: 'Submit your work' }));
+  var rep = h('div', { class: 'card' });
+  rep.appendChild(h('p', { text: 'Enter your name, then copy the report or download it. Submit it the way your instructor asks. The report lists your scores and your final code for each task.' }));
+  var nm = h('input', { type: 'text', id: 'stname', 'aria-label': 'Your name', placeholder: 'Your name', autocomplete: 'name' });
+  nm.value = S.name;
+  nm.addEventListener('input', function () { S.name = nm.value; save(); });
+  rep.appendChild(h('div', { class: 'field' }, [h('label', { for: 'stname', text: 'Name' }), nm]));
+  var ta = h('textarea', { class: 'report', readonly: '', 'aria-label': 'Report text' });
+  var b1 = h('button', { class: 'btn primary', text: 'Build report', onclick: function () { ta.value = buildReport(); } });
+  var b2 = h('button', { class: 'btn', text: 'Copy report', onclick: function () {
+    ta.value = buildReport(); ta.select();
+    var done = function () { b2.textContent = 'Copied'; setTimeout(function () { b2.textContent = 'Copy report'; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(ta.value).then(done, function () { try { document.execCommand('copy'); done(); } catch (e) {} }); }
+    else { try { document.execCommand('copy'); done(); } catch (e) {} }
+  } });
+  var b3 = h('button', { class: 'btn', text: 'Download .txt', onclick: function () {
+    var txt = buildReport(); ta.value = txt;
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+    a.download = 'week' + D.num + '_report.txt'; document.body.appendChild(a); a.click(); a.remove();
+  } });
+  rep.appendChild(h('div', { class: 'row' }, [b1, b2, b3]));
+  rep.appendChild(ta);
+  p.appendChild(rep);
+  updateLab();
+}
+function quizTally() {
+  var correct = 0, answered = 0;
+  D.quiz.forEach(function (q, i) { var a = S.quiz[i]; if (a !== undefined && a !== null) { answered++; if (a === q.answer) { correct++; } } });
+  return { correct: correct, answered: answered, total: D.quiz.length };
+}
+function buildReport() {
+  var L = [], s = labScore(), q = quizTally();
+  var max = D.lab.tasks.filter(function (t) { return !t.bonus; }).reduce(function (a, t) { return a + t.points; }, 0);
+  var lec = D.lecture.filter(function (_s, i) { return S.lecDone[i]; }).length;
+  L.push('Course: ' + D.course_title);
+  L.push('Week ' + D.num + ': ' + D.title);
+  L.push('Name: ' + (S.name || '(not entered)'));
+  L.push('Generated: ' + new Date().toLocaleString());
+  L.push('');
+  L.push('Lecture sections marked complete: ' + lec + ' of ' + D.lecture.length);
+  L.push('Lab score (browser autograder): ' + s.score + ' of ' + max + (s.bonus ? ', bonus ' + s.bonus : ''));
+  L.push('Quiz: ' + q.correct + ' correct, ' + q.answered + ' answered, ' + q.total + ' questions');
+  L.push('');
+  D.lab.tasks.forEach(function (t, i) {
+    var r = S.lab[t.id];
+    L.push('==== ' + (t.bonus ? 'Bonus' : 'Task ' + (i + 1)) + ': ' + t.title + ' (' + (r ? r.passed + '/' + r.total + ' tests' : 'not checked') + ') ====');
+    L.push(S.code['lab_' + t.id] !== undefined ? S.code['lab_' + t.id] : t.starter);
+    L.push('');
+  });
+  return L.join('\n');
+}
+
+/* ---------- quiz ---------- */
+function updateQuiz() {
+  var q = quizTally();
+  var el = document.getElementById('quizscore');
+  if (el) { el.textContent = q.correct + ' correct of ' + q.answered + ' answered, ' + q.total + ' questions'; }
+  tiles.quiz.textContent = q.correct + '/' + q.total;
+}
+function renderQuiz() {
+  var p = document.getElementById('panel-quiz');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'card', html: D.quiz_intro_html }));
+  p.appendChild(h('div', { class: 'row' }, [
+    h('strong', { text: 'Score: ' }), h('span', { id: 'quizscore', class: 'badge info' }),
+    h('span', { style: 'flex:1' }),
+    h('button', { class: 'btn', text: 'Reset quiz', onclick: function () {
+      if (!confirm('Clear all quiz answers?')) { return; } S.quiz = {}; save(); renderQuiz();
+    } })
+  ]));
+  D.quiz.forEach(function (q, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: 'Question ' + (i + 1) + ' of ' + D.quiz.length }));
+    card.appendChild(mcq({ cls: 'qbox', q: q.q, options: q.options, answer: q.answer, why: q.why, saved: S.quiz[i], onAnswer: function (k) { S.quiz[i] = k; save(); updateQuiz(); } }));
+    p.appendChild(card);
+  });
+  updateQuiz();
+}
+
+/* ---------- shell ---------- */
+document.getElementById('kicker').textContent = D.course_title + ', Week ' + D.num;
+document.getElementById('title').textContent = D.title;
+document.title = D.course_title + ' Week ' + D.num + ' ' + D.title;
+var chips = document.getElementById('chips');
+[D.lecture_minutes + ' min lecture', D.lab_minutes + ' min lab', D.quiz.length + ' quiz questions'].forEach(function (t) { chips.appendChild(h('li', { text: t })); });
+var tabs = [['overview', 'Overview'], ['lecture', 'Lecture'], ['lab', 'Lab'], ['quiz', 'Quiz']];
+var tl = document.getElementById('tablist');
+tabs.forEach(function (t) {
+  var b = h('button', { role: 'tab', id: 'tab-' + t[0], 'aria-controls': 'panel-' + t[0], 'aria-selected': 'false', text: t[1] });
+  b.addEventListener('click', function () { show(t[0]); });
+  tl.appendChild(b);
+});
+function show(name) {
+  tabs.forEach(function (t) {
+    document.getElementById('panel-' + t[0]).hidden = (t[0] !== name);
+    document.getElementById('tab-' + t[0]).setAttribute('aria-selected', t[0] === name ? 'true' : 'false');
+  });
+  try { history.replaceState(null, '', '#' + name); } catch (e) {}
+  window.scrollTo(0, 0);
+  document.querySelectorAll('#panel-' + name + ' textarea.code').forEach(function (t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight + 4, 640) + 'px'; });
+}
+renderOverview(); renderLecture(); renderLab(); renderQuiz();
+var start = (location.hash || '').replace('#', '');
+show(tabs.some(function (t) { return t[0] === start; }) ? start : 'overview');
+})();
+</script>
+</body>
+</html>

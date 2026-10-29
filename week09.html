@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python for Engineers Week 9 NumPy Arrays: Vectorized Engineering Calculations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f0; --card:#ffffff; --ink:#1a1f24; --mute:#59636e; --line:#d9d6cb;
+  --accent:#0a5aa0; --accent-ink:#ffffff; --accent-soft:#e4eef8;
+  --ok:#17692f; --ok-bg:#e5f3e9; --bad:#a82217; --bad-bg:#fcebe8; --warn:#8a5a00; --warn-bg:#fdf3dc;
+  --code-bg:#f0eee6; --out-bg:#e6edf6; --out-ink:#0a2a66;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#11151a; --card:#192028; --ink:#e7ebef; --mute:#9aa6b2; --line:#2c3641;
+    --accent:#5eaeea; --accent-ink:#0b1219; --accent-soft:#17283a;
+    --ok:#6fd08c; --ok-bg:#15301f; --bad:#ff8a7d; --bad-bg:#3a1b18; --warn:#f0c060; --warn-bg:#33290f;
+    --code-bg:#10161c; --out-bg:#e6edf6; --out-ink:#0a2a66;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px}
+.skip{position:absolute;left:-999px}
+.skip:focus{left:8px;top:8px;background:var(--card);padding:8px;z-index:50}
+header.top{padding:28px 0 12px}
+.kicker{font-size:13px;color:var(--mute);letter-spacing:.02em;margin:0 0 4px}
+h1{font-size:clamp(24px,5vw,34px);line-height:1.2;margin:0 0 10px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.chips li{font-size:13px;border:1px solid var(--line);background:var(--card);padding:2px 10px;border-radius:999px;color:var(--mute)}
+nav.tabs{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px;color:var(--mute);cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible,button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.statusbar{position:sticky;top:46px;z-index:15;background:var(--card);border:1px solid var(--line);border-radius:8px;margin:10px 0;padding:6px 12px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--mute)}
+.statusbar .grow{flex:1}
+main{padding:16px 0 80px}
+.panel[hidden]{display:none}
+h2{font-size:22px;margin:24px 0 8px;font-weight:600}
+h3{font-size:18px;margin:0 0 6px;font-weight:600}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 12px;padding-left:22px}
+li{margin:2px 0}
+code{font-family:var(--mono);font-size:.92em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:0 0 16px}
+.card .meta{font-size:13px;color:var(--mute);margin:0 0 8px}
+.hook{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 0 16px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.tile .big{font-size:24px;font-weight:600;font-family:var(--mono)}
+.tile .lbl{font-size:13px;color:var(--mute)}
+.bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden;margin:6px 0 14px}
+.bar>span{display:block;height:100%;background:var(--accent);width:0}
+button.btn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;border-radius:6px;cursor:pointer}
+button.btn:hover{border-color:var(--accent)}
+button.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.cell{margin:12px 0}
+textarea.code{display:block;width:100%;font-family:var(--mono);font-size:14px;line-height:1.5;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px 12px;resize:vertical;tab-size:4;white-space:pre;overflow:auto;min-height:60px}
+.stdin{margin-top:6px}
+.stdin label{font-size:13px;color:var(--mute);display:block}
+textarea.stdin-box{width:100%;font-family:var(--mono);font-size:13px;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-height:48px}
+.out{margin-top:8px}
+pre.stdout{margin:0;background:var(--out-bg);color:var(--out-ink);font-family:var(--mono);font-size:13.5px;padding:10px 12px;border-radius:6px;border:1px solid #b9c8dc;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.err{margin-top:8px;border:1px solid var(--bad);background:var(--bad-bg);color:var(--bad);border-radius:6px;padding:8px 12px;font-size:14px}
+.err pre{margin:4px 0 0;font-family:var(--mono);font-size:13px;white-space:pre-wrap;color:inherit}
+.out img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin-top:8px;border:1px solid var(--line)}
+.tests{list-style:none;margin:8px 0 0;padding:0}
+.tests li{display:flex;gap:10px;align-items:flex-start;padding:4px 0;font-size:14px;border-bottom:1px dashed var(--line)}
+.badge{font-family:var(--mono);font-size:12px;font-weight:500;padding:1px 8px;border-radius:4px;flex:none}
+.badge.pass{background:var(--ok-bg);color:var(--ok)}
+.badge.fail{background:var(--bad-bg);color:var(--bad)}
+.badge.info{background:var(--accent-soft);color:var(--accent)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.hint{margin:8px 0;padding:8px 12px;background:var(--warn-bg);color:var(--ink);border-radius:6px;font-size:14px;border:1px solid var(--line)}
+.q{margin:0 0 6px;font-weight:500}
+.q p{margin:0 0 8px}
+.q pre,.card pre{background:var(--code-bg);padding:8px 12px;border-radius:6px;overflow:auto;font-family:var(--mono);font-size:13.5px;font-weight:400;margin:0 0 10px}
+.q pre code,.card pre code{background:none;padding:0}
+.opts{list-style:none;padding:0;margin:0}
+.opts button{display:block;width:100%;text-align:left;font:inherit;font-size:15px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:6px 0;cursor:pointer}
+.opts button:hover:not(:disabled){border-color:var(--accent)}
+.opts button.right{border-color:var(--ok);background:var(--ok-bg)}
+.opts button.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opts button:disabled{cursor:default}
+.why{margin-top:8px;font-size:14px;padding:8px 12px;border-radius:6px;background:var(--accent-soft)}
+.checkq{margin:14px 0 4px;padding:12px;border:1px dashed var(--line);border-radius:8px}
+.done-row{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px}
+.field{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.field input{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);min-width:240px}
+textarea.report{width:100%;min-height:200px;font-family:var(--mono);font-size:12.5px;background:var(--code-bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px}
+table{border-collapse:collapse;width:100%;margin:0 0 12px;font-size:14px}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--code-bg)}
+.small{font-size:13px;color:var(--mute)}
+@media (max-width:600px){ .field input{min-width:0;width:100%} .statusbar{top:44px} }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+  <p class="kicker" id="kicker"></p>
+  <h1 id="title"></h1>
+  <ul class="chips" id="chips"></ul>
+</div></header>
+<nav class="tabs" aria-label="Sections"><div class="wrap" role="tablist" id="tablist"></div></nav>
+<main id="main"><div class="wrap">
+  <div class="statusbar" id="statusbar" role="status" aria-live="polite">
+    <span id="pystatus">Python starts when you run your first cell.</span>
+    <span class="grow"></span>
+    <button class="btn" id="stopbtn" hidden>Stop</button>
+  </div>
+  <section class="panel" id="panel-overview"></section>
+  <section class="panel" id="panel-lecture" hidden></section>
+  <section class="panel" id="panel-lab" hidden></section>
+  <section class="panel" id="panel-quiz" hidden></section>
+</div></main>
+
+<script id="data" type="application/json">{"course_id": "pyeng", "course_title": "Python for Engineers", "pyodide_base": "https://cdn.jsdelivr.net/pyodide/v0.27.8/full/", "num": 9, "title": "NumPy Arrays: Vectorized Engineering Calculations", "hook": "Evaluating a formula at one point takes one line. Evaluating it at 10,000 points with a loop takes a loop, a list, and patience. NumPy arrays let you write the formula once and apply it to every point at the same time, and the work runs in compiled code that is typically much faster than a Python loop. This week you replace loops with array math and revisit the algebra you already know: functions, graphs, and solving equations.", "objectives": ["create arrays with <code>np.array<\/code>, <code>np.arange<\/code>, <code>np.linspace<\/code>, <code>np.zeros<\/code>, and <code>np.ones<\/code>", "apply formulas to whole arrays without loops", "select values with indexes, slices, and boolean masks", "compute means, standard deviations, minimums, maximums, and positions", "work with two-dimensional arrays and the <code>axis<\/code> option", "connect a Python function to the algebra function it represents"], "summary": "<ul><li><code>import numpy as np<\/code>. Arrays hold one type and do arithmetic item by item.<\/li><li>Create arrays with <code>np.array<\/code>, <code>np.arange(start, stop, step)<\/code>, <code>np.linspace(start, stop, count)<\/code>, <code>np.zeros<\/code>, <code>np.ones<\/code>.<\/li><li>Write formulas on whole arrays: <code>y = x ** 2 - 3 * x + 2<\/code>. <code>np.sin<\/code>, <code>np.exp<\/code>, <code>np.sqrt<\/code> work on arrays too.<\/li><li>A mask <code>a &gt; 21<\/code> selects items: <code>a[mask]<\/code>. Combine masks with <code>&amp;<\/code>, <code>|<\/code>, <code>~<\/code> and put each comparison in parentheses.<\/li><li><code>mean<\/code>, <code>std<\/code>, <code>min<\/code>, <code>max<\/code>, <code>sum<\/code>, <code>argmax<\/code>, <code>argmin<\/code> summarize. <code>axis=0<\/code> works down rows, <code>axis=1<\/code> across columns.<\/li><li>Compare floats with <code>np.isclose<\/code> and <code>np.allclose<\/code>.<\/li><li>A Python function and an algebra function are the same idea. An array of inputs gives a table of outputs.<\/li><\/ul>", "lecture": [{"title": "From lists to arrays", "minutes": 15, "html": "<p>A Python list holds any mix of values. A NumPy <strong>array<\/strong> holds values of one type in a regular block of memory. That restriction is what makes array math fast and lets you write <code>a * 2<\/code> and get every item doubled.<\/p>\n<p>Import NumPy once with <code>import numpy as np<\/code>. The short name <code>np<\/code> is the standard. An array has useful attributes: <code>a.shape<\/code> (its dimensions), <code>a.dtype<\/code> (its type), and <code>a.size<\/code> (the number of items).<\/p>\n<p>Compare <code>[1, 2, 3] * 2<\/code> with <code>np.array([1, 2, 3]) * 2<\/code> in the cell below.<\/p>", "cells": [{"code": "import numpy as np\nprint([1, 2, 3] * 2)\na = np.array([1, 2, 3])\nprint(a * 2)\nprint(a.shape, a.dtype, a.size)\n", "stdin": null, "note": "A list repeats. An array does arithmetic on each item."}], "check": {"q": "What does <code>np.array([1, 2, 3]) * 2<\/code> produce?", "options": ["An array holding 1, 2, 3, 1, 2, 3", "The number 12", "An array holding 2, 4, 6", "An error"], "answer": 2, "why": "Array operators work item by item. A list would repeat instead."}}, {"title": "Creating arrays", "minutes": 15, "html": "<p>The functions you will use most:<\/p>\n<table><thead><tr><th>Call<\/th><th>Result<\/th><\/tr><\/thead><tbody><tr><td><code>np.arange(0, 5)<\/code><\/td><td>0, 1, 2, 3, 4 (stop excluded, like <code>range<\/code>, but steps may be decimals)<\/td><\/tr><tr><td><code>np.linspace(0, 1, 5)<\/code><\/td><td>5 values from 0 to 1 including both ends<\/td><\/tr><tr><td><code>np.zeros(4)<\/code> / <code>np.ones(4)<\/code><\/td><td>arrays filled with 0 or 1<\/td><\/tr><tr><td><code>np.array(list)<\/code><\/td><td>an array from a list<\/td><\/tr><\/tbody><\/table>\n<p>Use <code>linspace<\/code> when you want an exact count of points that includes the end value. Use <code>arange<\/code> when you care about the step size.<\/p>", "cells": [{"code": "print(np.arange(0, 5))\nprint(np.linspace(0, 1, 5))\nprint(np.arange(0, 1, 0.25))\nprint(np.zeros(3), np.ones(3))\n", "stdin": null, "note": null}, {"code": "x = np.linspace(0, 10, 101)\nprint(len(x), x[0], x[-1], x[1])\n", "stdin": null, "note": "101 points from 0 to 10 give a step of 0.1."}], "check": {"q": "How many values does <code>np.linspace(0, 1, 5)<\/code> produce?", "options": ["5", "1", "6", "4"], "answer": 0, "why": "The third argument is the count of points, and the end value is included."}}, {"title": "Vectorized math", "minutes": 20, "html": "<p>An operation on an array applies to every item. NumPy also provides math functions that work on arrays: <code>np.sin<\/code>, <code>np.cos<\/code>, <code>np.exp<\/code>, <code>np.sqrt<\/code>, <code>np.log10<\/code>. This is <strong>vectorized<\/strong> code: it replaces the loop.<\/p>\n<p>This links straight to algebra. A function such as <code>f(x) = x**2 - 3*x + 2<\/code> becomes an expression of an array <code>x<\/code>. The array <code>y<\/code> holds the whole table of values, ready to graph next week.<\/p>", "cells": [{"code": "x = np.arange(-2, 6)\ny = x ** 2 - 3 * x + 2\nprint(x)\nprint(y)\n", "stdin": null, "note": "The roots of this quadratic are 1 and 2. Look for zeros in <code>y<\/code>."}, {"code": "current = np.linspace(0, 2, 5)\nR = 10\npower = current ** 2 * R\nprint(current)\nprint(power)\n", "stdin": null, "note": null}, {"code": "import time\nn = 200000\nxs = list(range(n))\nstart = time.perf_counter()\nys = [v * 0.5 + 1 for v in xs]\nt_loop = time.perf_counter() - start\narr = np.arange(n)\nstart = time.perf_counter()\nya = arr * 0.5 + 1\nt_vec = time.perf_counter() - start\nprint(\"Loop seconds:\", round(t_loop, 4))\nprint(\"NumPy seconds:\", round(t_vec, 4))\n", "stdin": null, "note": "Timing varies by computer. NumPy usually wins by a wide margin on large arrays."}], "check": {"q": "Which line evaluates <code>y = 3x + 2<\/code> at every item of the array <code>x<\/code>?", "options": ["<code>y = [3 * x + 2]<\/code>", "<code>y = 3x + 2<\/code>", "<code>y = 3 * x + 2<\/code>", "<code>for y in x: 3 * x + 2<\/code>"], "answer": 2, "why": "Array arithmetic uses the operators you know. The expression applies to each item."}}, {"title": "Indexing, slicing, and boolean masks", "minutes": 20, "html": "<p>Indexing and slicing work like lists: <code>a[0]<\/code>, <code>a[-1]<\/code>, <code>a[1:4]<\/code>. NumPy adds <strong>boolean masks<\/strong>. A comparison such as <code>a &gt; 21<\/code> gives an array of True and False values. Use that array as an index to keep only the True positions.<\/p>\n<p>Combine masks with <code>&amp;<\/code> (and), <code>|<\/code> (or), and <code>~<\/code> (not), and put each comparison in parentheses. Useful helpers: <code>np.sum(mask)<\/code> counts True values, <code>np.any(mask)<\/code> and <code>np.all(mask)<\/code> ask whether any or all are True, and <code>np.where(mask, a, b)<\/code> picks from <code>a<\/code> or <code>b<\/code> item by item.<\/p>", "cells": [{"code": "temps = np.array([20.5, 21.0, 19.8, 22.3, 21.7])\nmask = temps > 21\nprint(mask)\nprint(temps[mask])\nprint(np.sum(mask), temps.max())\n", "stdin": null, "note": null}, {"code": "data = np.array([21.0, 85.0, 21.3, -999, 21.1])\ngood = data[(data > 0) & (data < 50)]\nprint(good)\nprint(np.where(data > 50, \"HIGH\", \"ok\"))\n", "stdin": null, "note": "Each comparison needs its own parentheses when combined with <code>&amp;<\/code>."}], "check": {"q": "What does <code>a[a &gt; 2]<\/code> return for <code>a = np.array([1, 5, 2, 8])<\/code>?", "options": ["An array holding 5 and 8", "An array holding 1 and 2", "An array holding True, False, False, True", "The number 2"], "answer": 0, "why": "The mask selects the items where the comparison is True."}}, {"title": "Statistics and aggregation", "minutes": 15, "html": "<p>Arrays have methods for summaries: <code>a.mean()<\/code>, <code>a.std()<\/code>, <code>a.min()<\/code>, <code>a.max()<\/code>, <code>a.sum()<\/code>. <code>np.argmax(a)<\/code> and <code>np.argmin(a)<\/code> return the <strong>position<\/strong> of the largest and smallest item. By default <code>a.std()<\/code> is the population standard deviation. Add <code>ddof=1<\/code> for the sample version.<\/p>\n<p>The <strong>RMS<\/strong> (root mean square) value is <code>np.sqrt(np.mean(v ** 2))<\/code>. For a sine wave of amplitude A it equals <code>A / sqrt(2)<\/code>.<\/p>", "cells": [{"code": "t = np.linspace(0, 1, 1000, endpoint=False)\nv = 5 * np.sin(2 * np.pi * 5 * t)\nprint(round(v.max(), 3))\nprint(round(np.sqrt(np.mean(v ** 2)), 4))\nprint(round(5 / np.sqrt(2), 4))\n", "stdin": null, "note": "This is five cycles of a 5 V sine wave. The RMS matches the formula."}, {"code": "x = np.array([3.0, 7.0, 2.0, 9.0])\nprint(x.mean(), x.std(), x.std(ddof=1))\nprint(np.argmax(x), np.argmin(x))\n", "stdin": null, "note": null}], "check": {"q": "What does <code>np.argmax(x)<\/code> return?", "options": ["The largest item", "The average position", "The position of the largest item", "The number of items"], "answer": 2, "why": "<code>argmax<\/code> returns an index. Use <code>x[np.argmax(x)]<\/code> or <code>x.max()<\/code> for the value."}}, {"title": "Two-dimensional arrays", "minutes": 15, "html": "<p>A two-dimensional array is a table: rows and columns. <code>a.shape<\/code> is <code>(rows, columns)<\/code>. Index with <code>a[row, column]<\/code>. A slice <code>a[:, 1]<\/code> is column 1 and <code>a[0, :]<\/code> is row 0.<\/p>\n<p>Summary functions accept an <code>axis<\/code>. <code>axis=0<\/code> combines down the rows and gives one result per column. <code>axis=1<\/code> combines across the columns and gives one result per row.<\/p>", "cells": [{"code": "data = np.array([[20.0, 21.0, 22.0, 23.0],\n                 [19.0, 19.5, 20.0, 20.5]])\nprint(data.shape)\nprint(data[1, 2], data[:, 0])\nprint(data.mean(axis=1))\nprint(data.max(axis=0))\n", "stdin": null, "note": "Rows are sensors and columns are times. <code>axis=1<\/code> averages each sensor over time."}], "check": {"q": "For an array with 3 rows and 4 columns, what is the shape of <code>a.mean(axis=0)<\/code>?", "options": ["<code>(4,)<\/code>", "<code>(3,)<\/code>", "<code>()<\/code>", "<code>(3, 4)<\/code>"], "answer": 0, "why": "<code>axis=0<\/code> averages down the rows, leaving one value per column, so four values."}}, {"title": "Speed, types, and precision", "minutes": 15, "html": "<p>Arrays default to <strong>float64<\/strong> for decimal data and <strong>int64<\/strong> for whole numbers. Mixing integers and floats in one array gives floats. Dividing integers with <code>/<\/code> gives floats.<\/p>\n<p>Floating-point comparison problems from week 3 still apply. Use <code>np.isclose(a, b)<\/code> or <code>np.allclose(a, b)<\/code> to compare arrays. Avoid <code>==<\/code> on computed floats.<\/p>", "cells": [{"code": "a = np.array([1, 2, 3])\nb = np.array([1.0, 2.5, 3.0])\nprint(a.dtype, b.dtype, (a / 2).dtype)\nprint(np.arange(0, 1, 0.1)[3] == 0.3)\nprint(np.isclose(np.arange(0, 1, 0.1)[3], 0.3))\n", "stdin": null, "note": null}], "check": {"q": "Which call compares two float arrays with a tolerance?", "options": ["<code>np.same(a, b)<\/code>", "<code>a is b<\/code>", "<code>np.allclose(a, b)<\/code>", "<code>a == b<\/code>"], "answer": 2, "why": "<code>allclose<\/code> returns True when all item pairs are close enough, which avoids rounding noise."}}, {"title": "Putting it together: a sensor and function study", "minutes": 15, "html": "<p>This program tests a thermistor model and finds the points that cross a limit. It generates the data with array math, uses a mask to flag out-of-range values, and reports statistics. Read the code, predict the output, and then change the limit.<\/p>", "cells": [{"code": "temp_c = np.linspace(0, 100, 11)\nresistance = 10000 * np.exp(-0.04 * (temp_c - 25))\nprint(np.round(resistance[:4]).tolist())\n\nlimit = 3000\nover = temp_c[resistance < limit]\nprint(\"Resistance drops below 3000 ohm at\", over.min(), \"C and above\")\nprint(\"Mean resistance:\", round(resistance.mean(), 1))\n", "stdin": null, "note": "<code>np.exp<\/code> applies to every item. Try limit values of 1000 and 20000."}]}], "lecture_minutes": 130, "lab": {"summary": "Vectorized engineering calculations: power tables, quadratic roots, sensor spike removal, RMS of a waveform, a sensor matrix, and a loop-free projectile.", "intro_html": "<p>You will redo several earlier calculations with arrays and no loops. Keep each variable name exactly as given. Printing is optional unless a task says so. Remember to <code>import numpy as np<\/code> at the top of your code.<\/p>\n<p>The checks compare arrays with a tolerance. Use array math and avoid loops. A loop that builds a list will usually still pass the check. The goal is practice with array formulas.<\/p>", "tasks": [{"id": "t1", "title": "Power versus current", "points": 15, "minutes": 20, "bonus": false, "prompt_html": "<p>A 10 ohm resistor carries currents from 0 to 2 A in five evenly spaced steps (0, 0.5, 1, 1.5, 2). Create <code>currents<\/code> with <code>np.linspace<\/code>, <code>voltage<\/code> (V = I * R), and <code>power<\/code> (P = I squared times R).<\/p>", "starter": "import numpy as np\n\nR = 10\n\ncurrents = ...\nvoltage = ...\npower = ...\n\nprint(power)\n", "hint_html": "<p><code>np.linspace(0, 2, 5)<\/code> gives the five currents. The formulas look the same as with single numbers: <code>currents * R<\/code> and <code>currents ** 2 * R<\/code>.<\/p>", "stdin": null, "tests": {"setup": "import numpy as np", "items": [["currents", "approx(currents, [0, 0.5, 1, 1.5, 2])", "Use np.linspace(0, 2, 5)."], ["voltage", "approx(voltage, [0, 5, 10, 15, 20])", "Multiply the currents array by R."], ["power", "approx(power, [0, 2.5, 10, 22.5, 40])", "Use currents ** 2 * R."], ["results are arrays", "isinstance(power, np.ndarray) and isinstance(voltage, np.ndarray)", "Use NumPy arrays, not lists."]]}}, {"id": "t2", "title": "Evaluate a quadratic and find its roots", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>Let <code>f(x) = x ** 2 - 3 * x + 2<\/code>. With <code>x = np.arange(-2, 6)<\/code> compute <code>y<\/code>, then find:<\/p>\n<ul><li><code>roots<\/code>: the x values where <code>y == 0<\/code><\/li><li><code>y_min<\/code>: the smallest value in <code>y<\/code><\/li><li><code>x_at_min<\/code>: the first x where <code>y<\/code> takes its smallest value<\/li><\/ul>", "starter": "import numpy as np\n\nx = np.arange(-2, 6)\n\ny = ...\nroots = ...\ny_min = ...\nx_at_min = ...\n\nprint(y, roots, y_min, x_at_min)\n", "hint_html": "<p><code>roots = x[y == 0]<\/code> uses a mask. <code>y_min = y.min()<\/code>. For the position of the smallest item use <code>np.argmin(y)<\/code> and index <code>x<\/code> with it.<\/p>", "stdin": null, "tests": {"setup": "import numpy as np", "items": [["y values", "approx(y, [12, 6, 2, 0, 0, 2, 6, 12])", "Use x ** 2 - 3 * x + 2."], ["roots are 1 and 2", "approx(roots, [1, 2])", "Use a mask: x[y == 0]."], ["y_min is 0", "y_min == 0", "Use y.min()."], ["x_at_min is 1", "x_at_min == 1", "np.argmin returns the first position of the minimum."]]}}, {"id": "t3", "title": "Remove spikes with a mask", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>A sensor log has bad values: <code>-999<\/code> for no reading and spikes above 50. Create:<\/p>\n<ul><li><code>clean<\/code>: only the values greater than 0 and less than 50<\/li><li><code>n_removed<\/code>: how many values were removed<\/li><li><code>clean_mean<\/code>: the mean of <code>clean<\/code><\/li><\/ul>", "starter": "import numpy as np\n\ndata = np.array([21.0, 21.2, 85.0, 21.1, -999, 21.3, 21.4, 90.5, 21.2])\n\nclean = ...\nn_removed = ...\nclean_mean = ...\n\nprint(clean, n_removed, clean_mean)\n", "hint_html": "<p><code>(data &gt; 0) &amp; (data &lt; 50)<\/code> is the mask. Then <code>data[mask]<\/code>. <code>n_removed<\/code> is <code>data.size - clean.size<\/code>.<\/p>", "stdin": null, "tests": {"setup": "import numpy as np", "items": [["clean values", "approx(clean, [21.0, 21.2, 21.1, 21.3, 21.4, 21.2])", "Keep values with 0 < value < 50."], ["n_removed is 3", "n_removed == 3", "Compare the sizes before and after."], ["clean_mean is 21.2", "approx(clean_mean, 21.2)", "Take the mean of clean."], ["works for other data", "approx(rerun(src.replace('21.0, 21.2, 85.0, 21.1, -999, 21.3, 21.4, 90.5, 21.2', '10.0, 99.0, 20.0'))['clean'], [10.0, 20.0])", "Use the variable data, not typed numbers."]]}}, {"id": "t4", "title": "RMS of a waveform", "points": 15, "minutes": 25, "bonus": false, "prompt_html": "<p>Create <code>t = np.linspace(0, 1, 1000, endpoint=False)<\/code> and a 5 V amplitude, 5 Hz sine wave <code>v = 5 * np.sin(2 * np.pi * 5 * t)<\/code>. Compute:<\/p>\n<ul><li><code>v_peak<\/code>: the largest value of <code>v<\/code><\/li><li><code>v_mean<\/code>: the mean of <code>v<\/code><\/li><li><code>v_rms<\/code>: the square root of the mean of <code>v ** 2<\/code><\/li><\/ul>", "starter": "import numpy as np\n\nt = np.linspace(0, 1, 1000, endpoint=False)\nv = 5 * np.sin(2 * np.pi * 5 * t)\n\nv_peak = ...\nv_mean = ...\nv_rms = ...\n\nprint(v_peak, v_mean, v_rms)\n", "hint_html": "<p><code>v.max()<\/code>, <code>v.mean()<\/code>, and <code>np.sqrt(np.mean(v ** 2))<\/code>. The mean of a full number of sine cycles is about 0.<\/p>", "stdin": null, "tests": {"setup": "import numpy as np", "items": [["peak is 5 V", "approx(v_peak, 5.0, rel=1e-6)", "Use v.max()."], ["mean is about 0", "abs(v_mean) < 1e-9", "A whole number of cycles averages to zero."], ["RMS is 5 / sqrt(2)", "approx(v_rms, 5 / math.sqrt(2), rel=1e-6)", "Square, take the mean, then the square root."]]}}, {"id": "t5", "title": "A sensor matrix", "points": 20, "minutes": 30, "bonus": false, "prompt_html": "<p><code>data<\/code> holds temperatures. Each row is a sensor and each column is a time. Compute:<\/p>\n<ul><li><code>row_means<\/code>: the mean of each sensor over time<\/li><li><code>col_max<\/code>: the maximum of each time over all sensors<\/li><li><code>hottest_sensor<\/code>: the row number (starting at 0) with the highest mean<\/li><li><code>overall_mean<\/code>: the mean of all values<\/li><\/ul>", "starter": "import numpy as np\n\ndata = np.array([[20.0, 21.0, 22.0, 23.0],\n                 [19.0, 19.5, 20.0, 20.5],\n                 [25.0, 24.0, 23.0, 22.0]])\n\nrow_means = ...\ncol_max = ...\nhottest_sensor = ...\noverall_mean = ...\n\nprint(row_means, col_max, hottest_sensor, overall_mean)\n", "hint_html": "<p>Use <code>data.mean(axis=1)<\/code> for each row and <code>data.max(axis=0)<\/code> for each column. Then <code>np.argmax(row_means)<\/code>. <code>overall_mean<\/code> is <code>data.mean()<\/code>.<\/p>", "stdin": null, "tests": {"setup": "import numpy as np", "items": [["row means", "approx(row_means, [21.5, 19.75, 23.5])", "Use axis=1 to average across each row."], ["column maxima", "approx(col_max, [25, 24, 23, 23])", "Use axis=0 to compare down each column."], ["hottest sensor is row 2", "int(hottest_sensor) == 2", "np.argmax of the row means gives the row number."], ["overall mean", "approx(overall_mean, 259 / 12)", "Use data.mean() with no axis."]]}}, {"id": "t6", "title": "Projectile without a loop", "points": 20, "minutes": 25, "bonus": false, "prompt_html": "<p>Repeat the projectile from week 4 using arrays. For <code>v0 = 20.0<\/code> m/s at 45 degrees, <code>t = np.linspace(0, 3, 7)<\/code> gives times from 0 to 3 s in 0.5 s steps. Compute:<\/p>\n<ul><li><code>x<\/code> and <code>y<\/code>: position arrays for those times<\/li><li><code>flying<\/code>: a boolean mask for times where <code>y &gt;= 0<\/code><\/li><li><code>last_time<\/code>: the last time when the projectile is still at or above the ground<\/li><li><code>max_height<\/code>: the largest <code>y<\/code> among the flying times<\/li><\/ul>", "starter": "import numpy as np\n\nv0 = 20.0\ng = 9.81\nangle = np.radians(45)\nt = np.linspace(0, 3, 7)\n\nx = ...\ny = ...\nflying = ...\nlast_time = ...\nmax_height = ...\n\nprint(last_time, max_height)\n", "hint_html": "<p><code>x = v0 * np.cos(angle) * t<\/code> and <code>y = v0 * np.sin(angle) * t - 0.5 * g * t ** 2<\/code>. <code>flying = y &gt;= 0<\/code>. Then <code>t[flying][-1]<\/code> gives the last flying time and <code>y[flying].max()<\/code> the highest point.<\/p>", "stdin": null, "tests": {"setup": "import numpy as np", "items": [["x values", "approx(x, [0, 7.0711, 14.1421, 21.2132, 28.2843, 35.3553, 42.4264], rel=1e-4)", "x = v0 * cos(angle) * t"], ["y at 1.5 s is 10.18", "approx(y[3], 10.1769, rel=1e-4)", "y = v0 * sin(angle) * t - 0.5 * g * t ** 2"], ["six flying points", "int(np.sum(flying)) == 6", "The last time with y >= 0 is 2.5 s."], ["last_time is 2.5", "approx(last_time, 2.5)", "Index the times with the mask and take the last item."], ["max_height", "approx(max_height, 10.1769, rel=1e-4)", "Take the maximum of y over the flying times."]]}}, {"id": "b1", "title": "Normalize an array", "points": 10, "minutes": 20, "bonus": true, "prompt_html": "<p>Scale <code>values<\/code> so that the smallest becomes 0 and the largest becomes 1: <code>(values - min) / (max - min)<\/code>. Store the result in <code>scaled<\/code>.<\/p>", "starter": "import numpy as np\n\nvalues = np.array([12.0, 15.0, 18.0, 30.0])\n\nscaled = ...\n\nprint(scaled)\n", "hint_html": "<p><code>values.min()<\/code> and <code>values.max()<\/code> give the two limits. The whole formula is one expression.<\/p>", "stdin": null, "tests": {"setup": "import numpy as np", "items": [["scaled values", "approx(scaled, [0, 1 / 6, 1 / 3, 1])", "Subtract the minimum and divide by the range."], ["endpoints are 0 and 1", "scaled.min() == 0 and scaled.max() == 1", "The smallest maps to 0 and the largest to 1."]]}}]}, "lab_minutes": 150, "quiz": [{"q": "What does <code>np.arange(2, 8, 2)<\/code> produce?", "options": ["<code>[2 4 6 8]<\/code>", "<code>[2 4 6]<\/code>", "<code>[2 3 4 5 6 7]<\/code>", "<code>[4 6 8]<\/code>"], "answer": 1, "why": "The step is 2, the start is included, and the stop is excluded."}, {"q": "How many values does <code>np.linspace(0, 10, 11)<\/code> return?", "options": ["9", "12", "11", "10"], "answer": 2, "why": "The third argument is the count of points, and both ends are included."}, {"q": "What is <code>np.array([1, 2, 3]) + 10<\/code>?", "options": ["<code>[10 20 30]<\/code>", "<code>[1 2 13]<\/code>", "<code>[1, 2, 3, 10]<\/code>", "<code>[11 12 13]<\/code>"], "answer": 3, "why": "Array arithmetic applies to each item."}, {"q": "What does <code>a[a &gt; 2]<\/code> return for <code>a = np.array([1, 5, 2, 8])<\/code>?", "options": ["<code>[5 8]<\/code>", "<code>[1 2]<\/code>", "<code>[False True False True]<\/code>", "<code>[2]<\/code>"], "answer": 0, "why": "The mask <code>a &gt; 2<\/code> selects items 5 and 8."}, {"q": "How do you combine two conditions in a NumPy mask?", "options": ["<code>a &gt; 0 and a &lt; 10<\/code>", "<code>(a &gt; 0) &amp; (a &lt; 10)<\/code>", "<code>a &gt; 0 + a &lt; 10<\/code>", "<code>a &gt; 0 &amp;&amp; a &lt; 10<\/code>"], "answer": 1, "why": "Use <code>&amp;<\/code> with parentheses around each comparison. Plain <code>and<\/code> fails on arrays."}, {"q": "For an array with 3 rows and 4 columns, what is the shape of <code>a.mean(axis=1)<\/code>?", "options": ["<code>(3, 4)<\/code>", "<code>(4,)<\/code>", "<code>(3,)<\/code>", "<code>(1,)<\/code>"], "answer": 2, "why": "<code>axis=1<\/code> averages across the columns for each row, leaving one value per row."}, {"q": "What does <code>np.argmax([3, 9, 4])<\/code> return?", "options": ["2", "3", "9", "1"], "answer": 3, "why": "The largest item is 9, and it sits at position 1."}, {"q": "What is the RMS of a sine wave with an amplitude of 10 V?", "options": ["About 7.07 V", "About 5 V", "About 14.1 V", "10 V"], "answer": 0, "why": "RMS is the amplitude divided by the square root of 2, which is 10 / 1.414 = 7.07."}, {"q": "What does <code>[1, 2] * 3<\/code> give, and what does <code>np.array([1, 2]) * 3<\/code> give?", "options": ["<code>[1, 2, 1, 2, 1, 2]<\/code> and <code>[1 2 1 2 1 2]<\/code>", "<code>[1, 2, 1, 2, 1, 2]<\/code> and <code>[3 6]<\/code>", "An error for both", "<code>[3, 6]<\/code> and <code>[3 6]<\/code>"], "answer": 1, "why": "A list repeats under <code>*<\/code>. An array multiplies each item."}, {"q": "Why use <code>np.isclose<\/code> instead of <code>==<\/code> for computed floats?", "options": ["<code>==<\/code> only works on integers", "<code>isclose<\/code> is easier to type", "Rounding errors can make equal results differ slightly", "NumPy forbids <code>==<\/code>"], "answer": 2, "why": "Tiny differences in the last digits are normal for floats. A tolerance accounts for them."}, {"q": "What does <code>np.where(a &gt; 0, 1, 0)<\/code> produce?", "options": ["The number of positive items", "An error", "The positions where <code>a<\/code> is above 0", "An array with 1 where <code>a<\/code> is above 0 and 0 elsewhere"], "answer": 3, "why": "<code>np.where(condition, x, y)<\/code> chooses <code>x<\/code> or <code>y<\/code> for each item based on the condition."}, {"q": "What dtype does <code>np.array([1, 2.5, 3])<\/code> have?", "options": ["<code>float64<\/code>", "<code>int64<\/code>", "<code>str<\/code>", "<code>list<\/code>"], "answer": 0, "why": "A mix of integers and floats becomes all floats."}], "quiz_minutes": 18, "quiz_intro_html": "<p>Answer each question. You see the explanation right after you choose. You can reset the quiz and try again.<\/p>"}</script>
+<script id="harness" type="text/x-python">import sys, io, os, json, ast, base64, builtins, traceback, contextlib, math, random
+
+os.environ.setdefault("MPLBACKEND", "Agg")
+import importlib
+if "" not in sys.path:
+    sys.path.insert(0, "")
+
+_OUT_CAP = 20000
+_LECTURE_NS = {"__name__": "__main__"}
+
+
+class _Capped(io.StringIO):
+    def write(self, s):
+        if self.tell() > _OUT_CAP:
+            raise RuntimeError("Output limit reached. Your code printed too much text.")
+        return super().write(s)
+
+
+def approx(a, b, rel=1e-6, abs_=1e-9):
+    try:
+        if "numpy" in sys.modules:
+            import numpy as _np
+            if isinstance(a, _np.ndarray) or isinstance(b, _np.ndarray):
+                return bool(_np.allclose(a, b, rtol=rel, atol=abs_))
+        if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+            return len(a) == len(b) and all(approx(x, y, rel, abs_) for x, y in zip(a, b))
+        return abs(float(a) - float(b)) <= max(abs_, rel * abs(float(b)))
+    except Exception:
+        return False
+
+
+def uses_node(src, *names):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return False
+    wanted = tuple(getattr(ast, n) for n in names)
+    return any(isinstance(n, wanted) for n in ast.walk(tree))
+
+
+def calls_name(src, name):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return False
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Call):
+            f = n.func
+            if isinstance(f, ast.Name) and f.id == name:
+                return True
+            if isinstance(f, ast.Attribute) and f.attr == name:
+                return True
+    return False
+
+
+def line_has(src, target, *words):
+    """True when an assignment to `target` has every word on its right side."""
+    for line in src.splitlines():
+        s = line.strip()
+        if s.startswith("#") or "=" not in s:
+            continue
+        left, _, right = s.partition("=")
+        if left.strip() == target and all(w in right for w in words):
+            return True
+    return False
+
+
+def run_with(src, inputs=(), ns=None):
+    """Run student source with scripted input() values; return what it printed."""
+    queue = list(inputs)
+    old = builtins.input
+
+    def _fake(prompt=""):
+        print(prompt, end="")
+        if not queue:
+            raise EOFError("input() called more times than expected")
+        v = queue.pop(0)
+        print(v)
+        return v
+
+    buf = io.StringIO()
+    builtins.input = _fake
+    try:
+        with contextlib.redirect_stdout(buf):
+            exec(compile(src, "<your code>", "exec"), ns if ns is not None else {"__name__": "__main__"})
+    finally:
+        builtins.input = old
+    return buf.getvalue()
+
+
+def rerun(src, **over):
+    """Execute student source again with top-level assignments replaced by the given constants.
+    Returns the resulting namespace. Output is discarded."""
+    tree = ast.parse(src)
+    for node in tree.body:
+        if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name) and node.targets[0].id in over):
+            node.value = ast.Constant(over[node.targets[0].id])
+    ast.fix_missing_locations(tree)
+    ns = {"__name__": "__main__"}
+    with contextlib.redirect_stdout(io.StringIO()):
+        exec(compile(tree, "<your code>", "exec"), ns)
+    return ns
+
+
+def count_defs(src):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return 0
+    return sum(isinstance(n, ast.FunctionDef) for n in ast.walk(tree))
+
+
+def count_classes(src):
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return 0
+    return sum(isinstance(n, ast.ClassDef) for n in ast.walk(tree))
+
+
+def _format_error(exc, code):
+    lines = code.split("\n")
+    if isinstance(exc, SyntaxError):
+        ln = exc.lineno
+        msg = "SyntaxError: " + str(exc.msg)
+        if ln and 1 <= ln <= len(lines):
+            msg += "\n  on line %d: %s" % (ln, lines[ln - 1].strip())
+        return msg
+    tb = traceback.TracebackException.from_exception(exc)
+    ln = None
+    for fs in tb.stack:
+        if fs.filename == "<your code>":
+            ln = fs.lineno
+    msg = "".join(tb.format_exception_only()).strip()
+    if ln and 1 <= ln <= len(lines):
+        msg += "\n  on line %d: %s" % (ln, lines[ln - 1].strip())
+    return msg
+
+
+def _make_input(stdin_lines, out):
+    queue = list(stdin_lines)
+
+    def _input(prompt=""):
+        out.write(str(prompt))
+        if not queue:
+            raise EOFError("input() ran out of lines. Type one value per line in the Input box under the code.")
+        val = queue.pop(0)
+        out.write(val + "\n")
+        return val
+
+    return _input
+
+
+def _exec_code(code, ns, out):
+    tree = ast.parse(code, "<your code>", "exec")
+    last = None
+    if tree.body and isinstance(tree.body[-1], ast.Expr):
+        last = ast.Expression(tree.body.pop().value)
+    exec(compile(tree, "<your code>", "exec"), ns)
+    if last is not None:
+        val = eval(compile(last, "<your code>", "eval"), ns)
+        if val is not None:
+            out.write(repr(val) + "\n")
+
+
+def _collect_images():
+    imgs = []
+    if "matplotlib.pyplot" in sys.modules:
+        import matplotlib.pyplot as plt
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", dpi=100, bbox_inches="tight")
+            imgs.append(base64.b64encode(buf.getvalue()).decode("ascii"))
+        plt.close("all")
+    return imgs
+
+
+def reset_lecture():
+    _LECTURE_NS.clear()
+    _LECTURE_NS["__name__"] = "__main__"
+
+
+def run_cell(req_json):
+    req = json.loads(req_json)
+    code = req.get("code", "")
+    mode = req.get("mode", "fresh")
+    stdin_lines = req.get("stdin") or []
+    tests = req.get("tests")
+    ns = _LECTURE_NS if mode == "lecture" else {"__name__": "__main__"}
+    importlib.invalidate_caches()
+    out = _Capped()
+    err = None
+    real_input = builtins.input
+    builtins.input = _make_input(stdin_lines, out)
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
+            try:
+                random.seed()
+                _exec_code(code, ns, out)
+            except BaseException as exc:
+                if isinstance(exc, KeyboardInterrupt):
+                    raise
+                err = _format_error(exc, code)
+    finally:
+        builtins.input = real_input
+    result = {"stdout": out.getvalue(), "error": err, "images": [], "tests": None}
+    try:
+        result["images"] = _collect_images()
+    except Exception as exc:
+        result["stdout"] += "\n(Plot could not be drawn: %s)" % exc
+    if tests is not None:
+        result["tests"] = _run_tests(tests, ns, code, err, out.getvalue())
+    return json.dumps(result)
+
+
+def _run_tests(tests, ns, code, err, stdout_text):
+    items = tests.get("items", [])
+    results = []
+    if err is not None:
+        for label, _expr, hint in items:
+            results.append({"label": label, "ok": False, "msg": "Fix the error above first."})
+        return results
+    env = ns
+    helpers = {
+        "approx": approx, "out": stdout_text, "src": code, "ast": ast,
+        "uses_node": uses_node, "calls_name": calls_name,
+        "count_defs": count_defs, "run_with": run_with, "rerun": rerun, "count_classes": count_classes, "line_has": line_has,
+        "math": math, "random": random, "io": io, "_in_tests": True,
+    }
+    _missing = object()
+    saved = {k: env.get(k, _missing) for k in helpers}
+    env.update(helpers)
+    sink = _Capped()
+    try:
+        setup = tests.get("setup")
+        if setup:
+            try:
+                with contextlib.redirect_stdout(sink):
+                    exec(compile(setup, "<tests>", "exec"), env)
+            except BaseException as exc:
+                reason = "Could not run the checks: %s: %s" % (type(exc).__name__, exc)
+                return [{"label": l, "ok": False, "msg": reason} for l, _e, _h in items]
+        for label, expr, hint in items:
+            try:
+                with contextlib.redirect_stdout(sink):
+                    ok = bool(eval(compile(expr, "<tests>", "eval"), env))
+                results.append({"label": label, "ok": ok, "msg": "" if ok else hint})
+            except BaseException as exc:
+                if isinstance(exc, KeyboardInterrupt):
+                    raise
+                results.append({"label": label, "ok": False,
+                                "msg": "%s (%s: %s)" % (hint, type(exc).__name__, exc)})
+    finally:
+        for k, v in saved.items():
+            if v is _missing:
+                env.pop(k, None)
+            else:
+                env[k] = v
+    return results
+</script>
+<script id="worker-src" type="text/plain">
+let py = null;
+self.onmessage = async function (e) {
+  const m = e.data;
+  if (m.type === 'init') {
+    try {
+      importScripts(m.base + 'pyodide.js');
+      py = await loadPyodide({ indexURL: m.base });
+      py.runPython(m.harness);
+      postMessage({ type: 'ready' });
+    } catch (err) {
+      postMessage({ type: 'initerror', message: String(err) });
+    }
+    return;
+  }
+  if (m.type === 'reset') {
+    try { py.runPython('reset_lecture()'); } catch (err) {}
+    postMessage({ type: 'resetdone' });
+    return;
+  }
+  if (m.type === 'run') {
+    try {
+      postMessage({ type: 'status', text: 'Loading packages if needed...' });
+      const quiet = { messageCallback: function () {}, errorCallback: function () {} };
+      await py.loadPackagesFromImports(m.code, quiet);
+      if (m.tests && m.tests.setup) { await py.loadPackagesFromImports(m.tests.setup, quiet); }
+      postMessage({ type: 'started' });
+      py.globals.set('_req_json', JSON.stringify({ code: m.code, stdin: m.stdin, mode: m.mode, tests: m.tests }));
+      const res = py.runPython('run_cell(_req_json)');
+      postMessage({ type: 'result', result: JSON.parse(res) });
+    } catch (err) {
+      postMessage({ type: 'error', message: String(err) });
+    }
+  }
+};
+</script>
+<script>
+(function () {
+'use strict';
+var D = JSON.parse(document.getElementById('data').textContent);
+var HARNESS = document.getElementById('harness').textContent;
+var WORKER_SRC = document.getElementById('worker-src').textContent;
+var KEY = 'pyeng-' + D.course_id + '-w' + D.num;
+
+/* ---------- storage ---------- */
+var mem = null;
+function loadState() {
+  try { var s = localStorage.getItem(KEY); if (s) { return JSON.parse(s); } } catch (e) {}
+  return mem || {};
+}
+var S = loadState();
+S.name = S.name || ''; S.lecDone = S.lecDone || {}; S.checks = S.checks || {};
+S.code = S.code || {}; S.lab = S.lab || {}; S.quiz = S.quiz || {};
+function save() { mem = S; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- dom helpers ---------- */
+function h(tag, attrs, kids) {
+  var n = document.createElement(tag);
+  if (attrs) { for (var k in attrs) {
+    if (k === 'class') { n.className = attrs[k]; }
+    else if (k === 'html') { n.innerHTML = attrs[k]; }
+    else if (k === 'text') { n.textContent = attrs[k]; }
+    else if (k.slice(0, 2) === 'on') { n.addEventListener(k.slice(2), attrs[k]); }
+    else { n.setAttribute(k, attrs[k]); }
+  } }
+  if (kids) { kids.forEach(function (c) { if (c) { n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); } }); }
+  return n;
+}
+
+/* ---------- python runner ---------- */
+var Py = (function () {
+  var worker = null, ready = false, current = null, queue = [], timer = null, nextId = 1;
+  var stopBtn = document.getElementById('stopbtn');
+  var statusEl = document.getElementById('pystatus');
+  function status(t) { statusEl.textContent = t; }
+  function start() {
+    var blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+    worker = new Worker(URL.createObjectURL(blob));
+    ready = false;
+    worker.onmessage = onMsg;
+    worker.onerror = function (e) { finish(failure('The Python worker crashed: ' + (e.message || 'unknown error'))); };
+    worker.postMessage({ type: 'init', harness: HARNESS, base: D.pyodide_base });
+    status('Starting Python (the first start takes 10 to 30 seconds)...');
+  }
+  function kill() {
+    if (worker) { worker.terminate(); worker = null; }
+    ready = false; clearTimer();
+  }
+  function failure(msg, req) {
+    var r = { stdout: '', error: msg, images: [], tests: null };
+    if (req && req.tests) {
+      r.tests = req.tests.items.map(function (it) { return { label: it[0], ok: false, msg: 'No result.' }; });
+    }
+    return r;
+  }
+  function clearTimer() { if (timer) { clearTimeout(timer); timer = null; } stopBtn.hidden = true; }
+  function armTimer() {
+    clearTimer(); stopBtn.hidden = false;
+    var secs = (current && current.req.timeout) || 20;
+    timer = setTimeout(function () {
+      kill();
+      finish(failure('Stopped after ' + secs + ' seconds. Look for a loop that never ends. Python restarted, so run earlier cells again.', current && current.req));
+      start();
+    }, secs * 1000);
+  }
+  function finish(result) {
+    var c = current; current = null; clearTimer();
+    if (c) { c.resolve(result); }
+    status(ready ? 'Python ready' : 'Python restarting...');
+    pump();
+  }
+  function onMsg(e) {
+    var m = e.data;
+    if (m.type === 'ready') { ready = true; status('Python ready'); pump(); }
+    else if (m.type === 'initerror') {
+      kill();
+      status('Python could not start');
+      var q = queue.slice(); queue = [];
+      if (current) { q.unshift(current); current = null; }
+      q.forEach(function (c) { c.resolve(failure('Python could not start. It needs an internet connection to load. Reload the page and try again. Details: ' + m.message, c.req)); });
+    }
+    else if (m.type === 'status') { status(m.text); }
+    else if (m.type === 'started') { status('Running...'); armTimer(); }
+    else if (m.type === 'result') { finish(m.result); }
+    else if (m.type === 'error') { finish(failure('Python error: ' + m.message, current && current.req)); }
+    else if (m.type === 'resetdone') { status('Python session reset'); }
+  }
+  function pump() {
+    if (!ready || current || !queue.length) { return; }
+    current = queue.shift();
+    status('Preparing...');
+    stopBtn.hidden = false;
+    worker.postMessage({ type: 'run', code: current.req.code, stdin: current.req.stdin || [], mode: current.req.mode, tests: current.req.tests || null });
+  }
+  stopBtn.addEventListener('click', function () {
+    if (!current) { return; }
+    kill();
+    finish(failure('Stopped. Python restarted, so run earlier cells again.', current.req));
+    start();
+  });
+  return {
+    run: function (req) {
+      return new Promise(function (resolve) {
+        queue.push({ id: nextId++, req: req, resolve: resolve });
+        if (!worker) { start(); } else { pump(); }
+      });
+    },
+    reset: function () { if (worker && ready) { worker.postMessage({ type: 'reset' }); } }
+  };
+})();
+
+/* ---------- result rendering ---------- */
+function renderResult(box, r, opts) {
+  box.innerHTML = '';
+  if (r.stdout) { box.appendChild(h('pre', { class: 'stdout', text: r.stdout.replace(/\n$/, '') })); }
+  if (r.error) { box.appendChild(h('div', { class: 'err', role: 'alert' }, [h('strong', { text: 'Error' }), h('pre', { text: r.error })])); }
+  (r.images || []).forEach(function (b64) { box.appendChild(h('img', { src: 'data:image/png;base64,' + b64, alt: 'Plot produced by your code' })); });
+  if (!r.stdout && !r.error && !(r.images && r.images.length) && !(opts && opts.quietEmpty)) {
+    box.appendChild(h('p', { class: 'small', text: 'Ran with no output. Use print() to see values.' }));
+  }
+  if (r.tests) {
+    var ul = h('ul', { class: 'tests' });
+    r.tests.forEach(function (t) {
+      ul.appendChild(h('li', null, [
+        h('span', { class: 'badge ' + (t.ok ? 'pass' : 'fail'), text: t.ok ? 'PASS' : 'FAIL' }),
+        h('span', { text: t.label + (t.ok || !t.msg ? '' : ' Hint: ' + t.msg) })
+      ]));
+    });
+    box.appendChild(ul);
+  }
+}
+
+/* ---------- code cell ---------- */
+function codeCell(o) {
+  var wrap = h('div', { class: 'cell' });
+  var ta = h('textarea', { class: 'code', spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', 'aria-label': o.label || 'Python code editor' });
+  ta.value = (S.code[o.key] !== undefined) ? S.code[o.key] : o.code;
+  function fit() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 4, 640) + 'px'; }
+  var stdinWrap = h('div', { class: 'stdin' });
+  var stdinBox = h('textarea', { class: 'stdin-box', spellcheck: 'false', 'aria-label': 'Input lines for input() calls' });
+  var stdinKey = o.key + ':stdin';
+  stdinBox.value = (S.code[stdinKey] !== undefined) ? S.code[stdinKey] : (o.stdin || []).join('\n');
+  stdinWrap.appendChild(h('label', { text: 'Input box: type one line per input() call, in order.' }));
+  stdinWrap.appendChild(stdinBox);
+  function syncStdin() { stdinWrap.hidden = ta.value.indexOf('input(') === -1; }
+  var out = h('div', { class: 'out', 'aria-live': 'polite' });
+  var runBtn = h('button', { class: 'btn primary', text: o.tests ? 'Run' : 'Run cell' });
+  var checkBtn = o.tests ? h('button', { class: 'btn', text: 'Check my work' }) : null;
+  var resetBtn = h('button', { class: 'btn', text: 'Reset code' });
+  var hintBtn = (o.hint) ? h('button', { class: 'btn', text: 'Show hint' }) : null;
+  var stale = h('span', { class: 'badge warn', text: 'Edited since last check', hidden: '' });
+  stale.hidden = true;
+  function go(withTests) {
+    var req = { code: ta.value, stdin: stdinBox.value ? stdinBox.value.split('\n') : [], mode: o.mode, timeout: o.timeout || 20 };
+    if (withTests) { req.tests = o.tests; }
+    runBtn.disabled = true; if (checkBtn) { checkBtn.disabled = true; }
+    out.innerHTML = ''; out.appendChild(h('p', { class: 'small', text: 'Working...' }));
+    Py.run(req).then(function (r) {
+      runBtn.disabled = false; if (checkBtn) { checkBtn.disabled = false; }
+      renderResult(out, r);
+      if (withTests && o.onCheck) { o.onCheck(r); stale.hidden = true; }
+    });
+  }
+  runBtn.addEventListener('click', function () { go(false); });
+  if (checkBtn) { checkBtn.addEventListener('click', function () { go(true); }); }
+  resetBtn.addEventListener('click', function () {
+    if (ta.value !== o.code && !confirm('Replace your code with the starting code?')) { return; }
+    ta.value = o.code; delete S.code[o.key]; save(); fit(); syncStdin();
+  });
+  var hintBox = null;
+  if (hintBtn) { hintBtn.addEventListener('click', function () {
+    if (hintBox) { hintBox.remove(); hintBox = null; hintBtn.textContent = 'Show hint'; return; }
+    hintBox = h('div', { class: 'hint', html: o.hint }); row.after(hintBox); hintBtn.textContent = 'Hide hint';
+  }); }
+  ta.addEventListener('input', function () {
+    S.code[o.key] = ta.value; save(); fit(); syncStdin(); if (o.tests && o.hasResult && o.hasResult()) { stale.hidden = false; }
+  });
+  stdinBox.addEventListener('input', function () { S.code[stdinKey] = stdinBox.value; save(); });
+  ta.addEventListener('keydown', function (e) {
+    if (e.key === 'Tab' && !e.shiftKey) {
+      e.preventDefault();
+      var s = ta.selectionStart, en = ta.selectionEnd;
+      ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(en);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+      ta.dispatchEvent(new Event('input'));
+    } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(false); }
+  });
+  var row = h('div', { class: 'row' }, [runBtn, checkBtn, hintBtn, resetBtn, stale]);
+  wrap.appendChild(ta); wrap.appendChild(stdinWrap); wrap.appendChild(row); wrap.appendChild(out);
+  setTimeout(function () { fit(); syncStdin(); }, 0);
+  wrap.refit = function () { fit(); };
+  return wrap;
+}
+
+/* ---------- multiple choice ---------- */
+function mcq(o) {
+  var box = h('div', { class: o.cls || 'checkq' });
+  box.appendChild(h('div', { class: 'q', html: o.q }));
+  var ul = h('ul', { class: 'opts' });
+  var btns = [];
+  var why = h('div', { class: 'why', hidden: '' }); why.hidden = true;
+  function lock(choice) {
+    btns.forEach(function (b, i) {
+      b.disabled = true;
+      if (i === o.answer) { b.classList.add('right'); }
+      else if (i === choice) { b.classList.add('wrong'); }
+    });
+    var ok = choice === o.answer;
+    why.hidden = false;
+    why.innerHTML = '';
+    why.appendChild(h('strong', { text: ok ? 'Correct. ' : 'Not quite. ' }));
+    why.appendChild(h('span', { html: o.why }));
+  }
+  o.options.forEach(function (t, i) {
+    var b = h('button', { type: 'button', html: t });
+    b.addEventListener('click', function () { if (o.saved === undefined || o.saved === null) { o.onAnswer(i); } lock(i); });
+    btns.push(b); ul.appendChild(h('li', null, [b]));
+  });
+  box.appendChild(ul); box.appendChild(why);
+  if (o.saved !== undefined && o.saved !== null) { lock(o.saved); }
+  return box;
+}
+
+/* ---------- overview ---------- */
+var tiles = {};
+function renderOverview() {
+  var p = document.getElementById('panel-overview');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'hook', html: '<strong>Why this week matters.</strong> ' + D.hook }));
+  p.appendChild(h('h2', { text: 'Progress' }));
+  var g = h('div', { class: 'grid' });
+  [['lecture', 'Lecture sections done'], ['lab', 'Lab score'], ['quiz', 'Quiz score']].forEach(function (x) {
+    var big = h('div', { class: 'big', text: '0' });
+    tiles[x[0]] = big;
+    g.appendChild(h('div', { class: 'tile' }, [big, h('div', { class: 'lbl', text: x[1] })]));
+  });
+  p.appendChild(g);
+  p.appendChild(h('h2', { text: 'Learning objectives' }));
+  p.appendChild(h('p', { text: 'After this week you can:' }));
+  var ul = h('ul'); D.objectives.forEach(function (t) { ul.appendChild(h('li', { html: t })); }); p.appendChild(ul);
+  p.appendChild(h('h2', { text: 'Time plan' }));
+  p.appendChild(h('p', { html: 'Lecture: about ' + D.lecture_minutes + ' minutes of reading and coding. Lab: about ' + D.lab_minutes + ' minutes. Quiz: about ' + D.quiz_minutes + ' minutes. Take a short break between sections.' }));
+  p.appendChild(h('h2', { text: 'This week’s lab' }));
+  p.appendChild(h('p', { html: D.lab.summary }));
+  p.appendChild(h('h2', { text: 'How this page works' }));
+  var how = h('ul');
+  [
+    'Python runs inside your browser. Nothing to install. The first run takes 10 to 30 seconds while Python loads; later runs are fast.',
+    'Every code cell is editable. Change values, break things, and run again. Press Ctrl+Enter (Command+Enter on Mac) in a cell to run it.',
+    'Cells in the Lecture tab share one Python session, so a variable made in one cell is available in the next. Use Reset Python session to start clean.',
+    'Your code and answers save in this browser on this device. Clearing site data erases them. Use the report in the Lab tab to submit your work.',
+    'If a cell runs more than 20 seconds, Python stops it. That usually means a loop that never ends.'
+  ].forEach(function (t) { how.appendChild(h('li', { text: t })); });
+  p.appendChild(how);
+}
+
+/* ---------- lecture ---------- */
+function updateLecture() {
+  var n = D.lecture.length, done = D.lecture.filter(function (_s, i) { return S.lecDone[i]; }).length;
+  var bar = document.getElementById('lecbar'); if (bar) { bar.firstChild.style.width = (100 * done / n) + '%'; }
+  var t = document.getElementById('lectext'); if (t) { t.textContent = done + ' of ' + n + ' sections complete'; }
+  tiles.lecture.textContent = done + '/' + n;
+}
+function renderLecture() {
+  var p = document.getElementById('panel-lecture');
+  p.innerHTML = '';
+  var top = h('div', { class: 'row' }, [
+    h('span', { id: 'lectext', class: 'small' }),
+    h('span', { class: 'grow', style: 'flex:1' }),
+    h('button', { class: 'btn', text: 'Reset Python session', onclick: function () { Py.reset(); } })
+  ]);
+  p.appendChild(top);
+  p.appendChild(h('div', { class: 'bar', id: 'lecbar' }, [h('span')]));
+  D.lecture.forEach(function (s, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: 'Section ' + (i + 1) + ' of ' + D.lecture.length + ', about ' + s.minutes + ' minutes' }));
+    card.appendChild(h('h3', { text: s.title }));
+    card.appendChild(h('div', { html: s.html }));
+    s.cells.forEach(function (c, j) {
+      if (c.note) { card.appendChild(h('p', { class: 'small', html: c.note })); }
+      card.appendChild(codeCell({ key: 'lec' + i + '_' + j, code: c.code, stdin: c.stdin, mode: 'lecture', label: 'Code for section ' + (i + 1) + ', cell ' + (j + 1) }));
+    });
+    if (s.check) {
+      var id = 'c' + i;
+      card.appendChild(mcq({ q: s.check.q, options: s.check.options, answer: s.check.answer, why: s.check.why, saved: S.checks[id], onAnswer: function (k) { S.checks[id] = k; save(); } }));
+    }
+    var cb = h('input', { type: 'checkbox', id: 'done' + i });
+    cb.checked = !!S.lecDone[i];
+    cb.addEventListener('change', function () { S.lecDone[i] = cb.checked; save(); updateLecture(); });
+    card.appendChild(h('div', { class: 'done-row' }, [cb, h('label', { for: 'done' + i, text: 'Mark this section complete' })]));
+    p.appendChild(card);
+  });
+  p.appendChild(h('h2', { text: 'Week summary' }));
+  p.appendChild(h('div', { class: 'card', html: D.summary }));
+  updateLecture();
+}
+
+/* ---------- lab ---------- */
+function labScore() {
+  var tot = 0, bonus = 0;
+  D.lab.tasks.forEach(function (t) {
+    var r = S.lab[t.id]; if (r && r.total) { var v = t.points * r.passed / r.total; if (t.bonus) { bonus += v; } else { tot += v; } }
+  });
+  return { score: Math.round(tot * 10) / 10, bonus: Math.round(bonus * 10) / 10 };
+}
+function updateLab() {
+  var s = labScore();
+  var max = D.lab.tasks.filter(function (t) { return !t.bonus; }).reduce(function (a, t) { return a + t.points; }, 0);
+  var el = document.getElementById('labscore'); if (el) { el.textContent = s.score + ' / ' + max + (s.bonus ? ' (+' + s.bonus + ' bonus)' : ''); }
+  tiles.lab.textContent = s.score + '/' + max;
+}
+function renderLab() {
+  var p = document.getElementById('panel-lab');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'card', html: D.lab.intro_html }));
+  var sc = h('div', { class: 'row' }, [h('strong', { text: 'Lab score: ' }), h('span', { id: 'labscore', class: 'badge info', text: '0' }), h('span', { class: 'small', text: 'Updates each time you press Check my work.' })]);
+  p.appendChild(sc);
+  D.lab.tasks.forEach(function (t, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: (t.bonus ? 'Bonus challenge' : 'Task ' + (i + 1)) + ', ' + t.points + (t.bonus ? ' bonus points' : ' points') + ', about ' + t.minutes + ' minutes' }));
+    card.appendChild(h('h3', { text: t.title }));
+    card.appendChild(h('div', { html: t.prompt_html }));
+    var res = S.lab[t.id];
+    var note = h('p', { class: 'small', text: res ? ('Last check: ' + res.passed + ' of ' + res.total + ' tests passed.') : 'Not checked yet.' });
+    var cell = codeCell({
+      key: 'lab_' + t.id, code: t.starter, stdin: t.stdin, mode: 'fresh', tests: t.tests, hint: t.hint_html, timeout: 20, label: 'Code for ' + t.title,
+      hasResult: function () { return !!S.lab[t.id]; },
+      onCheck: function (r) {
+        var passed = r.tests ? r.tests.filter(function (x) { return x.ok; }).length : 0;
+        S.lab[t.id] = { passed: passed, total: r.tests ? r.tests.length : 0, at: new Date().toISOString() };
+        save(); note.textContent = 'Last check: ' + passed + ' of ' + S.lab[t.id].total + ' tests passed.'; updateLab();
+      }
+    });
+    card.appendChild(cell); card.appendChild(note);
+    p.appendChild(card);
+  });
+  p.appendChild(h('h2', { text: 'Submit your work' }));
+  var rep = h('div', { class: 'card' });
+  rep.appendChild(h('p', { text: 'Enter your name, then copy the report or download it. Submit it the way your instructor asks. The report lists your scores and your final code for each task.' }));
+  var nm = h('input', { type: 'text', id: 'stname', 'aria-label': 'Your name', placeholder: 'Your name', autocomplete: 'name' });
+  nm.value = S.name;
+  nm.addEventListener('input', function () { S.name = nm.value; save(); });
+  rep.appendChild(h('div', { class: 'field' }, [h('label', { for: 'stname', text: 'Name' }), nm]));
+  var ta = h('textarea', { class: 'report', readonly: '', 'aria-label': 'Report text' });
+  var b1 = h('button', { class: 'btn primary', text: 'Build report', onclick: function () { ta.value = buildReport(); } });
+  var b2 = h('button', { class: 'btn', text: 'Copy report', onclick: function () {
+    ta.value = buildReport(); ta.select();
+    var done = function () { b2.textContent = 'Copied'; setTimeout(function () { b2.textContent = 'Copy report'; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(ta.value).then(done, function () { try { document.execCommand('copy'); done(); } catch (e) {} }); }
+    else { try { document.execCommand('copy'); done(); } catch (e) {} }
+  } });
+  var b3 = h('button', { class: 'btn', text: 'Download .txt', onclick: function () {
+    var txt = buildReport(); ta.value = txt;
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+    a.download = 'week' + D.num + '_report.txt'; document.body.appendChild(a); a.click(); a.remove();
+  } });
+  rep.appendChild(h('div', { class: 'row' }, [b1, b2, b3]));
+  rep.appendChild(ta);
+  p.appendChild(rep);
+  updateLab();
+}
+function quizTally() {
+  var correct = 0, answered = 0;
+  D.quiz.forEach(function (q, i) { var a = S.quiz[i]; if (a !== undefined && a !== null) { answered++; if (a === q.answer) { correct++; } } });
+  return { correct: correct, answered: answered, total: D.quiz.length };
+}
+function buildReport() {
+  var L = [], s = labScore(), q = quizTally();
+  var max = D.lab.tasks.filter(function (t) { return !t.bonus; }).reduce(function (a, t) { return a + t.points; }, 0);
+  var lec = D.lecture.filter(function (_s, i) { return S.lecDone[i]; }).length;
+  L.push('Course: ' + D.course_title);
+  L.push('Week ' + D.num + ': ' + D.title);
+  L.push('Name: ' + (S.name || '(not entered)'));
+  L.push('Generated: ' + new Date().toLocaleString());
+  L.push('');
+  L.push('Lecture sections marked complete: ' + lec + ' of ' + D.lecture.length);
+  L.push('Lab score (browser autograder): ' + s.score + ' of ' + max + (s.bonus ? ', bonus ' + s.bonus : ''));
+  L.push('Quiz: ' + q.correct + ' correct, ' + q.answered + ' answered, ' + q.total + ' questions');
+  L.push('');
+  D.lab.tasks.forEach(function (t, i) {
+    var r = S.lab[t.id];
+    L.push('==== ' + (t.bonus ? 'Bonus' : 'Task ' + (i + 1)) + ': ' + t.title + ' (' + (r ? r.passed + '/' + r.total + ' tests' : 'not checked') + ') ====');
+    L.push(S.code['lab_' + t.id] !== undefined ? S.code['lab_' + t.id] : t.starter);
+    L.push('');
+  });
+  return L.join('\n');
+}
+
+/* ---------- quiz ---------- */
+function updateQuiz() {
+  var q = quizTally();
+  var el = document.getElementById('quizscore');
+  if (el) { el.textContent = q.correct + ' correct of ' + q.answered + ' answered, ' + q.total + ' questions'; }
+  tiles.quiz.textContent = q.correct + '/' + q.total;
+}
+function renderQuiz() {
+  var p = document.getElementById('panel-quiz');
+  p.innerHTML = '';
+  p.appendChild(h('div', { class: 'card', html: D.quiz_intro_html }));
+  p.appendChild(h('div', { class: 'row' }, [
+    h('strong', { text: 'Score: ' }), h('span', { id: 'quizscore', class: 'badge info' }),
+    h('span', { style: 'flex:1' }),
+    h('button', { class: 'btn', text: 'Reset quiz', onclick: function () {
+      if (!confirm('Clear all quiz answers?')) { return; } S.quiz = {}; save(); renderQuiz();
+    } })
+  ]));
+  D.quiz.forEach(function (q, i) {
+    var card = h('div', { class: 'card' });
+    card.appendChild(h('p', { class: 'meta', text: 'Question ' + (i + 1) + ' of ' + D.quiz.length }));
+    card.appendChild(mcq({ cls: 'qbox', q: q.q, options: q.options, answer: q.answer, why: q.why, saved: S.quiz[i], onAnswer: function (k) { S.quiz[i] = k; save(); updateQuiz(); } }));
+    p.appendChild(card);
+  });
+  updateQuiz();
+}
+
+/* ---------- shell ---------- */
+document.getElementById('kicker').textContent = D.course_title + ', Week ' + D.num;
+document.getElementById('title').textContent = D.title;
+document.title = D.course_title + ' Week ' + D.num + ' ' + D.title;
+var chips = document.getElementById('chips');
+[D.lecture_minutes + ' min lecture', D.lab_minutes + ' min lab', D.quiz.length + ' quiz questions'].forEach(function (t) { chips.appendChild(h('li', { text: t })); });
+var tabs = [['overview', 'Overview'], ['lecture', 'Lecture'], ['lab', 'Lab'], ['quiz', 'Quiz']];
+var tl = document.getElementById('tablist');
+tabs.forEach(function (t) {
+  var b = h('button', { role: 'tab', id: 'tab-' + t[0], 'aria-controls': 'panel-' + t[0], 'aria-selected': 'false', text: t[1] });
+  b.addEventListener('click', function () { show(t[0]); });
+  tl.appendChild(b);
+});
+function show(name) {
+  tabs.forEach(function (t) {
+    document.getElementById('panel-' + t[0]).hidden = (t[0] !== name);
+    document.getElementById('tab-' + t[0]).setAttribute('aria-selected', t[0] === name ? 'true' : 'false');
+  });
+  try { history.replaceState(null, '', '#' + name); } catch (e) {}
+  window.scrollTo(0, 0);
+  document.querySelectorAll('#panel-' + name + ' textarea.code').forEach(function (t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight + 4, 640) + 'px'; });
+}
+renderOverview(); renderLecture(); renderLab(); renderQuiz();
+var start = (location.hash || '').replace('#', '');
+show(tabs.some(function (t) { return t[0] === start; }) ? start : 'overview');
+})();
+</script>
+</body>
+</html>
